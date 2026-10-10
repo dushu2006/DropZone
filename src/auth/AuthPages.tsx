@@ -25,6 +25,10 @@ export function PublicLanding() {
   if (status === 'authenticated') return <Navigate to="/app" replace />
   if (status === 'loading') return <AuthLoading message="Restoring your secure session…" />
   if (status === 'error') return <AuthBootstrapError />
+  return <LandingContent />
+}
+
+export function LandingContent() {
   return <main className="auth-page landing-page">
     <header className="auth-topbar"><DropZoneBrand /><nav><Link className="auth-nav-link" to="/login">Log in</Link><Link className="primary-button" to="/register">Create account <ArrowRight size={16} /></Link></nav></header>
     <section className="landing-hero">
@@ -34,7 +38,7 @@ export function PublicLanding() {
       <div className="landing-actions"><Link className="primary-button landing-primary" to="/login">Log in to DropZone <ArrowRight size={17} /></Link><Link className="landing-secondary" to="/register">Create an account</Link></div>
       <div className="landing-security-note"><LockKeyhole size={15} /><span>Private event spaces are available only to accounts with an active event membership.</span></div>
     </section>
-    <footer className="auth-footer">A calmer way to get things done, right where you are.</footer>
+    <footer className="auth-footer">A calmer way to get things done, right where you are. <Link to="/privacy">Privacy notice</Link></footer>
   </main>
 }
 

@@ -56,7 +56,10 @@ export function createSupabaseClient(config: Config) {
     },
   });
 }
-const result = validateSupabaseConfig(import.meta.env);
+const result = validateSupabaseConfig({
+  VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
+  VITE_SUPABASE_PUBLISHABLE_KEY: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+});
 export const supabaseClient = result.ok
   ? createSupabaseClient(result.config)
   : null;

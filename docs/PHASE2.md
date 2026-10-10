@@ -1,8 +1,10 @@
 # Phase 2 implementation and verification
 
+> Historical implementation detail (not the SAMARTHA acceptance result), preserved for architecture/policy context. The final delivery, current tests and release status supersede this document: see [FINAL_VERIFICATION.md](FINAL_VERIFICATION.md), [DEPLOYMENT.md](DEPLOYMENT.md) and [the acceptance checklist](../FINAL_ACCEPTANCE_CHECKLIST.md).
+
 ## Scope and current decision
 
-Implemented in the existing React/Vite + Supabase architecture, without modifying the Phase 1 migration or deploying anything. No production domain, participant onboarding, actual roster import, or pilot was performed. **Live verification is still pending. Do not treat this change as production approval or Phase 3 completion.**
+Implemented in the existing React/Vite + Supabase architecture, without modifying the Phase 1 migration or deploying anything. No production domain, participant onboarding, actual roster import, or pilot was performed. **Live verification is still pending. This historical checkpoint is not production approval.**
 
 The browser now uses real Supabase RPCs and Storage calls. Without configuration it fails closed; it never falls back to demonstration activity. The original prototype remains isolated behind the development-only opt-in switch.
 
@@ -139,18 +141,20 @@ Viewing uses authenticated Storage download into a temporary browser blob rather
      'select public.dz_maintenance()');
    ```
    Use Supabase Dashboard **Cron → new HTTP job** every 15 minutes to POST to `<PROJECT_URL>/functions/v1/maintenance`, with `X-Maintenance-Secret` from a protected/Vault-backed scheduler secret. Protect all job configuration from ordinary clients. The endpoint refuses to run if the secret is missing. Test with a disposable tombstoned object and check function/job logs. Schedule more frequent batches if cleanup consistently reports `more_may_remain=true`.
-8. Configure an approved public map tile URL/attribution if the default OSM provider is unsuitable. Restart Vite or rebuild after changing any `VITE_*` value.
+8. Final behavior: production requires an approved HTTPS tile URL and attribution; OSM fallback is development-only. See the final deployment runbook. Restart Vite or rebuild after changing any `VITE_*` value.
 9. For disposable local testing with Docker/Podman: `npm run db:start`, `npm run db:reset`, `npm run db:test`; serve the Edge Functions with local server-only secrets, set browser values to the printed local API URL/key, then `npm run dev`. When using Arena's proxied preview, the browser cannot reach sandbox `localhost`; use a reachable staging project or a correctly configured same-origin proxy. Do not point a remote browser at sandbox loopback.
 
-## Evidence and remaining verification
+## Historical checkpoint evidence (superseded by FINAL_VERIFICATION.md)
 
 Executed evidence is summarized in the final report. Automated coverage includes real migration replay/RLS in PGlite/PostGIS, structured fields, authorized search/feeds, replies and safe retries, lifecycle/retention, review/revision, reports/removal, block/mute, private inboxes, targeted recipients, transactional imports, geography, Storage schema-contract policies, rate limits, role revocation, and browser form/error/parser/location tests. The Storage fixture simulates metadata and verifier acknowledgement; it does **not** upload actual bytes to hosted Supabase.
 
 PGlite serializes transactions on one connection. The overlapping-request test verifies queued callers and counter behavior, **not** a multi-connection PostgreSQL stress test. The production locking design must still be exercised with parallel real JWT requests in staging.
 
-Pending: hosted Auth/refresh/email verification; direct PostgREST requests with real unrelated JWTs; true concurrent database sessions; hosted Storage API/verifier/cleanup; pg_cron execution; live tiles/GPS; mobile and assistive-technology end-to-end review. Supabase containers/project credentials and the map provider were not available for those checks here. No hosted readiness claim is justified until these pass.
+Pending at this earlier checkpoint: hosted Auth/refresh/email verification; direct PostgREST requests with real unrelated JWTs; true concurrent database sessions; hosted Storage API/verifier/cleanup; pg_cron execution; live tiles/GPS; mobile and assistive-technology end-to-end review. Supabase containers/project credentials and the map provider were not available for those checks here. No hosted readiness claim is justified until these pass.
 
-### Executed verification record — 2026-10-10
+### Earlier checkpoint verification record — 2026-10-10
+
+The final implementation subsequently added genuine independent native PostgreSQL concurrency and real Chromium responsive/axe tests. Final totals are 94 unit/integration tests plus 10 browser tests; use `FINAL_VERIFICATION.md` and the root acceptance checklist for current results, not the historical table below.
 
 | Check | Result | Evidence / boundary |
 |---|---|---|

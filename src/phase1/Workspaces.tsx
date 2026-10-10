@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Workbench } from '../phase2/Workbench'
+import { lazy, Suspense, useState } from 'react'
+const Workbench = lazy(() => import('../phase2/Workbench').then(module => ({ default: module.Workbench })))
 import type { FormEvent, ReactNode } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { ArrowRight, CheckCircle2, Copy, KeyRound, LockKeyhole, LogOut, RefreshCw, ShieldCheck, Users } from 'lucide-react'
@@ -100,7 +100,7 @@ function canOpenModeratorWorkspace(membership: EventMembershipAccess) {
 function ParticipantWorkspace({ membership }: { membership: EventMembershipAccess }) {
   return <WorkspaceFrame title={membership.event_name} subtitle="Participant workspace">
     <section className="phase1-notice"><span className="phase1-notice-icon"><Users size={18} /></span><div><strong>Your event membership is verified.</strong><p>Your community workflows use authorized Supabase records. No sample activity is shown.</p></div></section>
-    <Workbench key={membership.event_id} membership={membership} /><AccessSummary membership={membership} />
+    <Suspense fallback={<p role="status">Loading event workflows…</p>}><Workbench key={membership.event_id + membership.role + membership.permissions.join(",")} membership={membership} /></Suspense><AccessSummary membership={membership} />
   </WorkspaceFrame>
 }
 
@@ -108,7 +108,7 @@ function OrganizerWorkspace({ membership }: { membership: EventMembershipAccess 
   const moderatorPermissions = membership.permissions.filter((permission) => MODERATION_PERMISSIONS.includes(permission))
   return <WorkspaceFrame title={membership.event_name} subtitle="Organizer workspace">
     <section className="phase1-notice"><span className="phase1-notice-icon"><ShieldCheck size={18} /></span><div><strong>Organizer membership verified for this event.</strong><p>Manage real event workflows below. Counts reflect only records your account is authorized to read.</p></div></section>
-    <Workbench key={membership.event_id} membership={membership} /><AccessSummary membership={membership} />
+    <Suspense fallback={<p role="status">Loading event workflows…</p>}><Workbench key={membership.event_id + membership.role + membership.permissions.join(",")} membership={membership} /></Suspense><AccessSummary membership={membership} />
     <ParticipantInvitationForm membership={membership} />
     {moderatorPermissions.length > 0 && <section className="workspace-panel"><div className="workspace-panel-heading"><h2>Additional moderation grants</h2><p>These are explicit grants shown above, not permissions inherited from the organizer role.</p></div><Link className="auth-help-link" to={`/app/events/${encodeURIComponent(membership.event_id)}/moderator`}>Open assigned moderator workspace <ArrowRight size={14} /></Link></section>}
   </WorkspaceFrame>
@@ -117,7 +117,7 @@ function OrganizerWorkspace({ membership }: { membership: EventMembershipAccess 
 function ModeratorWorkspace({ membership }: { membership: EventMembershipAccess }) {
   return <WorkspaceFrame title={membership.event_name} subtitle="Moderator workspace">
     <section className="phase1-notice"><span className="phase1-notice-icon"><ShieldCheck size={18} /></span><div><strong>Moderator access is limited to assigned permissions.</strong><p>Review queues and actions below are limited to your explicit trusted grants.</p></div></section>
-    <Workbench key={membership.event_id} membership={membership} /><AccessSummary membership={membership} />
+    <Suspense fallback={<p role="status">Loading event workflows…</p>}><Workbench key={membership.event_id + membership.role + membership.permissions.join(",")} membership={membership} /></Suspense><AccessSummary membership={membership} />
   </WorkspaceFrame>
 }
 
@@ -204,7 +204,7 @@ function WorkspaceFrame({ title, subtitle, children }: { title: string; subtitle
 
   return <div className="phase1-app-shell">
     <aside className="phase1-sidebar"><Link className="auth-brand" to="/app"><span className="brand-mark" aria-hidden="true"><i /><i /><i /><i /></span><span>DropZone<span className="brand-period">.</span></span></Link><div className="phase1-sidebar-status"><LockKeyhole size={15} /><span>Authenticated workspace</span></div><div className="phase1-sidebar-bottom"><span className="phase1-avatar">{(session?.user.email ?? 'U').slice(0, 1).toUpperCase()}</span><span className="phase1-account-email">{session?.user.email ?? 'Signed-in account'}</span><button type="button" className="icon-button" onClick={() => void logout()} disabled={loggingOut} aria-label="Log out" title="Log out"><LogOut size={16} /></button></div></aside>
-    <div className="phase1-workspace"><header className="phase1-topbar"><div><span className="auth-eyebrow">PRIVATE EVENT WORKSPACE</span><strong>{title}</strong></div><div className="phase1-top-actions"><Link to="/app">My events</Link><Link to="/app/join">Join event</Link><button type="button" className="secondary-button" onClick={() => void logout()} disabled={loggingOut}><LogOut size={14} />{loggingOut ? 'Logging out…' : 'Log out'}</button></div></header><main className="phase1-main"><div className="phase1-page-heading"><h1>{title}</h1><p>{subtitle}</p></div>{logoutError && <p className="auth-error" role="alert">{logoutError}</p>}{children}</main></div>
+    <div className="phase1-workspace"><header className="phase1-topbar"><div><span className="auth-eyebrow">PRIVATE EVENT WORKSPACE</span><strong>{title}</strong></div><div className="phase1-top-actions"><Link to="/app">My events</Link><Link to="/app/join">Join event</Link><Link to="/app/account">Account</Link><button type="button" className="secondary-button" onClick={() => void logout()} disabled={loggingOut}><LogOut size={14} />{loggingOut ? 'Logging out…' : 'Log out'}</button></div></header><main className="phase1-main"><div className="phase1-page-heading"><h1>{title}</h1><p>{subtitle}</p></div>{logoutError && <p className="auth-error" role="alert">{logoutError}</p>}{children}</main></div>
   </div>
 }
 

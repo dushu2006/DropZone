@@ -38,9 +38,10 @@ Deno.serve(async (req) => {
       (row: { id: string; owner_id: string; status: string }) =>
         row.id === attachment_id &&
         row.owner_id === user.id &&
-        row.status === "pending",
+        ["pending", "ready"].includes(row.status),
     );
     if (!attachment) return json({ error: "Pending upload not found." }, 403);
+    if (attachment.status === "ready") return json({ verified: true });
     const admin = createClient(
       url,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,

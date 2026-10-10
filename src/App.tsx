@@ -2,7 +2,8 @@ import { lazy, Suspense } from 'react'
 import { BrowserRouter, Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { AlertCircle, ArrowRight, ShieldCheck } from 'lucide-react'
-import { AuthBootstrapError, AuthCallbackPage, AuthLoading, LoginPage, PublicLanding, RecoveryPage, RegisterPage, ResetPasswordPage } from './auth/AuthPages'
+import { LandingContent, AuthBootstrapError, AuthCallbackPage, AuthLoading, LoginPage, PublicLanding, RecoveryPage, RegisterPage, ResetPasswordPage } from './auth/AuthPages'
+import { AccountSettings, PrivacyNotice } from './auth/Account'
 import { AuthProvider, useAuth } from './auth/AuthProvider'
 import { AccessProvider } from './phase1/AccessProvider'
 import { AccessHome, EventWorkspace, JoinEventPage } from './phase1/Workspaces'
@@ -22,6 +23,8 @@ export function AppRoutes({
 }) {
   return <AuthProvider client={client}><Routes>
     <Route path="/" element={<PublicLanding />} />
+    <Route path="/privacy" element={<PrivacyNotice />} />
+    <Route path="/app/account" element={<PrivatePage client={client}><AccountSettings /></PrivatePage>} />
     <Route path="/login" element={<LoginPage />} />
     <Route path="/register" element={<RegisterPage />} />
     <Route path="/recovery" element={<RecoveryPage />} />
@@ -59,7 +62,7 @@ function NotFoundPage() {
 
 export default function App() {
   if (!supabaseClient || supabaseConfigError) {
-    return <BrowserRouter><Routes><Route path="*" element={<MissingConfigurationPage message={supabaseConfigError ?? 'Supabase configuration is not available.'} />} /></Routes></BrowserRouter>
+    return <BrowserRouter><Routes><Route path="/" element={<LandingContent />} /><Route path="/privacy" element={<PrivacyNotice />} /><Route path="*" element={<MissingConfigurationPage message={supabaseConfigError ?? 'Supabase configuration is not available.'} />} /></Routes></BrowserRouter>
   }
   return <BrowserRouter><AppRoutes client={supabaseClient} allowDevelopmentPreview={developmentPreviewEnabled} /></BrowserRouter>
 }

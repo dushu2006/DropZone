@@ -70,6 +70,7 @@ export function Conversations({
           />
           <ActionForm
             fields={[]}
+            requestScope={{ selected }}
             label="Mark this conversation read"
             submit={async (_, key) => {
               await command("conversation.read", { id: selected }, key);
@@ -302,7 +303,7 @@ export function Notifications({
                       ? "communications"
                       : k === "reply" || k === "post_decision"
                         ? "post"
-                        : "activity",
+                        : "safety",
                   id,
                 );
               }}

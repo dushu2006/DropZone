@@ -12,7 +12,7 @@ export function errorText(error: unknown) {
     : message;
 }
 export function useApi(eventId: string) {
-  const { client } = useAuth();
+  const { client, session } = useAuth();
   const read = useCallback(
     async <T>(kind: string, filter: Data = {}): Promise<T> => {
       const { data, error } = await client.rpc("dz_read", {
@@ -20,10 +20,14 @@ export function useApi(eventId: string) {
         p_kind: kind,
         p_filter: filter,
       });
-      if (error) throw error;
+      if (error) {
+        if (error.code === "42501" || error.code === "PGRST301")
+          window.dispatchEvent(new Event("dropzone:access-invalidated"));
+        throw error;
+      }
       return data as T;
     },
-    [client, eventId],
+    [client, eventId, session?.user.id],
   );
   const command = useCallback(
     async <T = Data>(
@@ -37,20 +41,27 @@ export function useApi(eventId: string) {
         p_data: data,
         p_request: request,
       });
-      if (result.error) throw result.error;
+      if (result.error) {
+        if (result.error.code === "42501" || result.error.code === "PGRST301")
+          window.dispatchEvent(new Event("dropzone:access-invalidated"));
+        throw result.error;
+      }
       return result.data as T;
     },
-    [client, eventId],
+    [client, eventId, session?.user.id],
   );
   return { read, command, client };
 }
 export function useQuery<T>(eventId: string, kind: string, filter: Data = {}) {
   const { read } = useApi(eventId);
+  const { session } = useAuth();
   const [data, setData] = useState<T | null>(null),
     [loading, setLoading] = useState(true),
     [error, setError] = useState("");
   const [version, setVersion] = useState(0);
   const key = JSON.stringify(filter);
+  const identity = JSON.stringify([session?.user.id, eventId, kind, key]);
+  const [loadedIdentity, setLoadedIdentity] = useState("");
   const generation = useRef(0);
   useEffect(() => {
     const current = ++generation.current;
@@ -59,7 +70,10 @@ export function useQuery<T>(eventId: string, kind: string, filter: Data = {}) {
     setData(null);
     read<T>(kind, JSON.parse(key))
       .then((value) => {
-        if (current === generation.current) setData(value);
+        if (current === generation.current) {
+          setData(value);
+          setLoadedIdentity(identity);
+        }
       })
       .catch((e) => {
         if (current === generation.current) setError(errorText(e));
@@ -70,8 +84,20 @@ export function useQuery<T>(eventId: string, kind: string, filter: Data = {}) {
     return () => {
       generation.current++;
     };
-  }, [read, kind, key, version]);
-  return { data, loading, error, refresh: () => setVersion((v) => v + 1) };
+  }, [read, kind, key, version, identity]);
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState !== "hidden") setVersion((v) => v + 1);
+    };
+    window.addEventListener("focus", refresh);
+    return () => window.removeEventListener("focus", refresh);
+  }, []);
+  return {
+    data: loadedIdentity === identity ? data : null,
+    loading,
+    error,
+    refresh: () => setVersion((v) => v + 1),
+  };
 }
 export type Post = {
   id: string;
@@ -85,6 +111,8 @@ export type Post = {
   effective_status: string;
   expires_at: string;
   created_at: string;
+  updated_at: string;
+  reviewed_at?: string | null;
   zone_id: string | null;
   decision_reason: string | null;
 };

@@ -1,0 +1,38 @@
+
+> dropzone@0.1.0 test
+> vitest run tests/concurrency.test.ts --run -t limited revoker
+
+
+ RUN  v5.0.3 /home/user/DropZone
+
+ ❯ tests/concurrency.test.ts (3 tests | 1 failed | 2 skipped) 779ms
+   ↓ allows exactly the configured limit across 12 independent PostgreSQL sessions
+   ↓ SAMARTHA: independent authenticated SQL sessions enforce event RLS and committed revocation
+   × SAMARTHA: a limited revoker cannot race a concurrent organizer grant 48ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/concurrency.test.ts > SAMARTHA: a limited revoker cannot race a concurrent organizer grant
+AssertionError: expected 'null' to match /cannot revoke organizer/i
+
+- Expected:
+/cannot revoke organizer/i
+
++ Received:
+"null"
+
+ ❯ tests/concurrency.test.ts:135:40
+    133|   }
+    134|   expect(waiting).toBe(true);await grant.query('commit');
+    135|   expect(String((await result).error)).toMatch(/cannot revoke organize…
+       |                                        ^
+    136|   const row=(await admin.query('select role,status from public.event_m…
+    137|  }finally{await grant.query('rollback');await revoke.query('rollback')…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 skipped (3)
+   Start at  12:12:26
+   Duration  1.10s (tests 79%, setup 12%, transform 7%, import 2%)

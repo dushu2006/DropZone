@@ -235,3 +235,4 @@
     display: block;
   }
 }
+.dz-workbench .leaflet-control-attribution a { text-decoration: underline; }

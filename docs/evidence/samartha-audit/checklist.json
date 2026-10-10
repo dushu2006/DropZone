@@ -1,0 +1,1899 @@
+{
+  "counts": {
+    "PASS": 196,
+    "BLOCKED": 39,
+    "NOT APPLICABLE": 1,
+    "FAIL": 0
+  },
+  "total": 236,
+  "items": [
+    {
+      "id": "A01",
+      "requirement": "Existing repository and modified/untracked work preserved",
+      "status": "PASS",
+      "evidence": "PRESERVATION: audit-start SHA-256 inventory retained; same branch/checkpoint e3f77a3; prior uncommitted work preserved. Compare changed-files.json.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "A02",
+      "requirement": "React/Vite/Supabase architecture retained",
+      "status": "PASS",
+      "evidence": "SOURCE: existing `src`, Vite, Supabase client/RPC/Storage paths. Native PG is test-only.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "A03",
+      "requirement": "Supabase remains the single application backend",
+      "status": "PASS",
+      "evidence": "SOURCE/package review; no separate Auth/database/file service introduced.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "A04",
+      "requirement": "Existing useful routes and visual design preserved",
+      "status": "PASS",
+      "evidence": "AUTH and BROWSER; existing workspace URLs and sage layout retained.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "A05",
+      "requirement": "Dependency installation reproducible",
+      "status": "PASS",
+      "evidence": "`npm ci` executed; dependencies locked; Node >=22 declared.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "A06",
+      "requirement": "Public project URL and publishable-key validation",
+      "status": "PASS",
+      "evidence": "CONFIG: missing, placeholder, malformed and insecure values rejected.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "A07",
+      "requirement": "Privileged browser keys rejected",
+      "status": "PASS",
+      "evidence": "CONFIG + HOSTING + NEGATIVE-BUILD: dummy secret/JWT/password rejected before bundling; anon/publishable accepted; errors omit values. Supabase loader and ZoneMap select explicit public fields; unused-env build is byte-identical. Bounded guard, not universal secret detection.",
+      "remediation": "S6 HIGH fixed: build-time privileged env rejection; positive/negative tests + dummy CLI failure.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "A08",
+      "requirement": "Configuration absence fails closed without fake login",
+      "status": "PASS",
+      "evidence": "CONFIG/AUTH; App shows public landing/privacy, private configuration guidance.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "A09",
+      "requirement": "Environment template and setup guidance complete",
+      "status": "PASS",
+      "evidence": "`.env.example`, README and RUNBOOK separate browser/server settings.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "A10",
+      "requirement": "Demo preview opt-in, labeled and development-only",
+      "status": "PASS",
+      "evidence": "App compile-time gate; BUILD/BUILD-BROWSER exclude production demo/fixture.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "A11",
+      "requirement": "No seeded production accounts/activity/counts",
+      "status": "PASS",
+      "evidence": "`db.seed.enabled=false`; SOURCE counts use authorized DB queries. Fixture remains test-only.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "A12",
+      "requirement": "Initial organizer requires trusted bootstrap",
+      "status": "PASS",
+      "evidence": "DB0 denies public escalation; `supabase/BOOTSTRAP.md` operator transaction.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "B01",
+      "requirement": "Public landing does not auto-login",
+      "status": "PASS",
+      "evidence": "AUTH public-entry test; BROWSER landing.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "B02",
+      "requirement": "Registration calls Supabase Auth with validated input",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): AUTH registration adapter test; no alternate credential database.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1 + X2. Auth operator: run real validated registration against authorized staging Auth."
+    },
+    {
+      "id": "B03",
+      "requirement": "Confirmation-required registration state",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): AUTH no-session signup state; no false logged-in success.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1 + X2. Auth operator: verify confirmation-required response and delivered confirmation with a real inbox."
+    },
+    {
+      "id": "B04",
+      "requirement": "Login success routes from returned session",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): AUTH login/session tests.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1 + X2. Auth operator: sign in an independently confirmed staging identity and verify the returned session/routes."
+    },
+    {
+      "id": "B05",
+      "requirement": "Invalid credentials remain on login with an error",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): AUTH and keyboard BROWSER test.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1 + X2. Auth operator: submit invalid credentials to real staging Auth and verify honest denial."
+    },
+    {
+      "id": "B06",
+      "requirement": "Session restored after fresh app mount",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): AUTH restore test; Supabase session API.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1 + X2. Auth operator: reload a real persisted staging session in a separate browser profile."
+    },
+    {
+      "id": "B07",
+      "requirement": "Late restore cannot resurrect a signed-out session",
+      "status": "PASS",
+      "evidence": "AUTH event-version regression.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "B08",
+      "requirement": "Auth refresh events update session state",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): SOURCE `AuthProvider` subscription; AUTH event handling. Live token refresh remains B25.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1 + X2. Auth operator: observe real refresh/expiry events and protected routing."
+    },
+    {
+      "id": "B09",
+      "requirement": "Session initialization errors expose retry",
+      "status": "PASS",
+      "evidence": "AUTH network/error test.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "B10",
+      "requirement": "Logout clears protected routing",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): AUTH logout test.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1 + X2. Auth operator: execute real sign-out, reload and confirm protected views remain unavailable."
+    },
+    {
+      "id": "B11",
+      "requirement": "Direct private URLs require a session",
+      "status": "PASS",
+      "evidence": "AUTH and BROWSER direct-route denial.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "B12",
+      "requirement": "Recovery requests use Supabase and trusted callback URL",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): AUTH recovery request test; `AuthPages.tsx`.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1 + X2 + X5. Auth/hosting operators: verify actual recovery delivery and trusted HTTPS redirect."
+    },
+    {
+      "id": "B13",
+      "requirement": "Password update requires a recovery session",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): AUTH valid/missing/expired recovery tests.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1 + X2 + X5. Auth operator: complete an actual recovery session and test missing/invalid tokens."
+    },
+    {
+      "id": "B14",
+      "requirement": "Expired recovery immediately locks password update",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): AUTH expiry regression.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1 + X2 + X5. Auth operator: expire a real recovery session and verify password update is denied."
+    },
+    {
+      "id": "B15",
+      "requirement": "Callback/session bootstrap errors are honest",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): SOURCE `AuthCallbackPage`/bootstrap states; no fabricated session. Live callback B24.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1 + X2 + X5. Auth/hosting operators: exercise callback errors on configured HTTPS origin."
+    },
+    {
+      "id": "B16",
+      "requirement": "Account switching cannot reuse old event grants",
+      "status": "PASS",
+      "evidence": "AUTH cached-permissions regression.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "B17",
+      "requirement": "Account switching cannot display old query data",
+      "status": "PASS",
+      "evidence": "FINAL-UI same-event identity-change regression.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "B18",
+      "requirement": "Browser role/localStorage/URL are not authority",
+      "status": "PASS",
+      "evidence": "AUTH forged organizer-route/storage tests; DB0 permission checks.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "B19",
+      "requirement": "Participant/organizer/moderator use trusted memberships",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): AUTH per-role routes; DB0 grants; BROWSER limited moderator navigation.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1. Security operator: provision real consenting participant, organizer and limited moderator identities and verify grants through independent JWTs."
+    },
+    {
+      "id": "B20",
+      "requirement": "Staff permissions are explicit, not inferred from role",
+      "status": "PASS",
+      "evidence": "DB0 and BROWSER limited-grant checks.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "B21",
+      "requirement": "Revocation refreshes visible workspace",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): FINAL-UI focus-revocation test; 60s/focus/error refresh and role/grant remount. Not instant erasure.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1. Security operator: revoke a real member while its browser is open and verify focus/periodic refresh and immediate subsequent backend denial."
+    },
+    {
+      "id": "B22",
+      "requirement": "Account settings update only own display name",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): DB1 profile-only RPC test; SOURCE account form; never updates roles.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1. Security operator: execute own-profile and forged other-user profile mutations through staging RPC."
+    },
+    {
+      "id": "B23",
+      "requirement": "Real registration, confirmation and email delivery",
+      "status": "BLOCKED",
+      "evidence": "X1 + X2. Only adapter states have been exercised.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X1 + X2. Only adapter states have been exercised."
+    },
+    {
+      "id": "B24",
+      "requirement": "Real recovery email, callback and password-reset flow",
+      "status": "BLOCKED",
+      "evidence": "X1 + X2 + trusted hosted redirect origin (X5).",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X1 + X2 + trusted hosted redirect origin (X5)."
+    },
+    {
+      "id": "B25",
+      "requirement": "Real refresh-token lifecycle, reload, expiry, logout and cross-account sessions",
+      "status": "BLOCKED",
+      "evidence": "X1 + X2. Requires independent real browser sessions/Auth tokens.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X1 + X2. Requires independent real browser sessions/Auth tokens."
+    },
+    {
+      "id": "C01",
+      "requirement": "Earlier migrations remain unchanged",
+      "status": "PASS",
+      "evidence": "PRESERVATION hash comparison: all eight earlier migration files unchanged since audit start. Only new migration 20261010030000_samartha_acceptance_security.sql added by this audit.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "C02",
+      "requirement": "Complete migration chain replays on clean isolated DB",
+      "status": "PASS",
+      "evidence": "DB0/DB1 replay all nine migrations with actual PostGIS in clean isolated PGlite. Hosted upgrade/backfill and CLI migration application remain X1/X6.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "C03",
+      "requirement": "Private application tables have RLS enabled",
+      "status": "PASS",
+      "evidence": "DB1 catalog enumeration/assertions.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "C04",
+      "requirement": "Anonymous private reads/writes denied",
+      "status": "PASS",
+      "evidence": "DB0/DB1 role-switched negative tests.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "C05",
+      "requirement": "Event isolation enforced on direct tables and RPC reads",
+      "status": "PASS",
+      "evidence": "DB0/DB1 isolated direct-table/RPC event denials; PG independent-session event RLS. Expired unapproved posts/files denied after S1 fix; not real JWT proof (C18).",
+      "remediation": "S1 HIGH fixed: expiry no longer authorizes unapproved versions or attachments.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "C06",
+      "requirement": "Team links cannot cross event boundaries",
+      "status": "PASS",
+      "evidence": "DB0 composite constraints; DB1 assignment/recipient tests.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "C07",
+      "requirement": "Users cannot directly change membership/role/grants",
+      "status": "PASS",
+      "evidence": "DB0 restricted table writes and helper execution tests.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "C08",
+      "requirement": "Signup metadata cannot self-assign staff",
+      "status": "PASS",
+      "evidence": "DB0 auth-user trigger ignores role metadata.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "C09",
+      "requirement": "Self-role change and staff-demotion escalation denied",
+      "status": "PASS",
+      "evidence": "DB0/DB1 self-change and limited-manager denials; PG grant-versus-revocation race now denies limited revoker after target becomes organizer (S3).",
+      "remediation": "S3 HIGH fixed: shared target lock serializes grant/demotion/revoke; independent-session regression.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "C10",
+      "requirement": "Invitation redemption grants participant only",
+      "status": "PASS",
+      "evidence": "DB0 participant-only invitation; DB1 revoked rejoin denial, unconsumed invitation on failure, explicit staff restoration (S2). No real invitations sent.",
+      "remediation": "S2 HIGH fixed: revoked members cannot rejoin with retained invitation; explicit staff restore only.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "C11",
+      "requirement": "Ownership enforced for content/file mutations",
+      "status": "PASS",
+      "evidence": "DB1 peer edit/resolve/file-finalization denial.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "C12",
+      "requirement": "Security-definer internal helpers inaccessible to clients",
+      "status": "PASS",
+      "evidence": "DB0/DB1 grants checks; SOURCE explicit revoke/fixed search paths.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "C13",
+      "requirement": "Read RPC remains security invoker",
+      "status": "PASS",
+      "evidence": "DB1 role-switch/RLS results; SOURCE `dz_read SECURITY INVOKER`.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "C14",
+      "requirement": "Reports, rosters, private messages and notifications isolated",
+      "status": "PASS",
+      "evidence": "DB1 feature-specific negative visibility tests.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "C15",
+      "requirement": "Revoked membership loses backend access immediately",
+      "status": "PASS",
+      "evidence": "DB1 content/conversation/team/Storage-metadata denial; PG independent reader after committed revocation. Already fetched content cannot be erased; hosted REST/bytes C18/I19.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "C16",
+      "requirement": "Retry receipts recheck revoked staff authority",
+      "status": "PASS",
+      "evidence": "DB1 successful team-save receipt replay denied after grant removal.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "C17",
+      "requirement": "No service-role browser bypass or RLS weakening",
+      "status": "PASS",
+      "evidence": "CONFIG/DB0/DB1; no disabled RLS or client privileged writes.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "C18",
+      "requirement": "Independent real JWT/PostgREST isolation and privilege checks",
+      "status": "BLOCKED",
+      "evidence": "X1. SQL-role shims are not JWT, API gateway or PostgREST evidence.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X1. SQL-role shims are not JWT, API gateway or PostgREST evidence."
+    },
+    {
+      "id": "D01",
+      "requirement": "Lost/found structured template",
+      "status": "PASS",
+      "evidence": "UI + DB1 dedicated template tests validate/persist fields.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D02",
+      "requirement": "Find-teammate structured template",
+      "status": "PASS",
+      "evidence": "UI + DB1 dedicated template tests, including quantity limits.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D03",
+      "requirement": "Need-resource structured template",
+      "status": "PASS",
+      "evidence": "UI + DB1 dedicated template tests.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D04",
+      "requirement": "Ask-for-help structured template",
+      "status": "PASS",
+      "evidence": "UI + DB1 dedicated template tests.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D05",
+      "requirement": "Offer-help/resources structured template",
+      "status": "PASS",
+      "evidence": "UI + DB1 dedicated template tests.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D06",
+      "requirement": "Promotional structured template and review policy",
+      "status": "PASS",
+      "evidence": "UI + DB1 promotion tests; server review-required rule.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D07",
+      "requirement": "Community-question structured template",
+      "status": "PASS",
+      "evidence": "UI + DB1 dedicated template tests.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D08",
+      "requirement": "Custom submission template persists separately from publication",
+      "status": "PASS",
+      "evidence": "UI + DB1 custom/review tests.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D09",
+      "requirement": "Required fields and category/quantity values validated server-side",
+      "status": "PASS",
+      "evidence": "UI validation and DB1 rejection tests; not just HTML required attributes.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D10",
+      "requirement": "Create success only after backend response",
+      "status": "PASS",
+      "evidence": "UI deferred/failure handling; SOURCE PostComposer uses real RPC.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D11",
+      "requirement": "Event-scoped feed and post details",
+      "status": "PASS",
+      "evidence": "DB1 authorized feed/detail and outsider filtering.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D12",
+      "requirement": "Search, category and zone filtering",
+      "status": "PASS",
+      "evidence": "DB1 search/category checks; SOURCE zone predicate and UI filter.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D13",
+      "requirement": "Stable keyset feed pagination",
+      "status": "PASS",
+      "evidence": "DB1 32-post fixture/new insertion: no duplicate/omitted older second-page posts.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D14",
+      "requirement": "Published own-post editing with concurrency conflict",
+      "status": "PASS",
+      "evidence": "DB1 owner/peer/stale-timestamp tests; BROWSER populated edit form.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D15",
+      "requirement": "Editing cannot extend original expiry",
+      "status": "PASS",
+      "evidence": "DB1 edit expiry equality assertion.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D16",
+      "requirement": "Protected revision history",
+      "status": "PASS",
+      "evidence": "DB1 revision snapshots/peer denial; rejected revision retains previous decision_reason after S4 fix; no old reason reconstruction is claimed.",
+      "remediation": "S4 MEDIUM fixed: new historical reasons retained; existing reasons cannot be invented.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D17",
+      "requirement": "Replies persist with correct post and author",
+      "status": "PASS",
+      "evidence": "DB1 reply/notification test.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D18",
+      "requirement": "Reply-parent references must be visible in same post",
+      "status": "PASS",
+      "evidence": "DB1 blocked/guessed-parent rejection; SOURCE validated parent.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D19",
+      "requirement": "Resolve differs from expiry",
+      "status": "PASS",
+      "evidence": "DB1 lifecycle + S1 state matrix: expiry preserves only prior publication authorization, never approves pending custom/promotion text or files.",
+      "remediation": "S1 HIGH fixed; current-version publication marker and conservative legacy backfill.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D20",
+      "requirement": "Delete differs from resolve/expiry and preserves eligible author history",
+      "status": "PASS",
+      "evidence": "DB1 lifecycle/tombstone/retention tests.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D21",
+      "requirement": "Pending custom post cancellation",
+      "status": "PASS",
+      "evidence": "DB1 review lifecycle; owner-only cancellation guard.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D22",
+      "requirement": "My activity uses actual author records",
+      "status": "PASS",
+      "evidence": "DB1 activity filtering; BROWSER activity screen.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D23",
+      "requirement": "Review/edit history redacted with deleted-content retention",
+      "status": "PASS",
+      "evidence": "DB1 aged deletion and archived retention execute actual maintenance. Post/revision text and decision reasons redacted after configured periods; audit retained. Physical cleanup remains I21.",
+      "remediation": "S7 MEDIUM fixed: current and historical review reasons now follow the existing content-retention window; red/green SQL regression.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D24",
+      "requirement": "No success/sample-content fallback on failure",
+      "status": "PASS",
+      "evidence": "UI/FINAL-UI failures; SOURCE QueryState/error boundary.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "D25",
+      "requirement": "Actual multi-user persisted lifecycle after browser refresh",
+      "status": "BLOCKED",
+      "evidence": "X1. Isolated SQL persistence is proven, hosted browser-to-DB persistence is not.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X1. Isolated SQL persistence is proven, hosted browser-to-DB persistence is not."
+    },
+    {
+      "id": "E01",
+      "requirement": "Submitted/awaiting-review/changes-requested states persist",
+      "status": "PASS",
+      "evidence": "DB1 custom revision/review test; post status constraint.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E02",
+      "requirement": "Review queue restricted by explicit permission",
+      "status": "PASS",
+      "evidence": "DB1 self-publish/staff checks; BROWSER permission-aware navigation.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E03",
+      "requirement": "Self-approval forbidden",
+      "status": "PASS",
+      "evidence": "DB1 custom self-review denial.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E04",
+      "requirement": "Approve/reject/request-changes reasons recorded",
+      "status": "PASS",
+      "evidence": "DB1 review/rejection reason persistence; audit writes.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E05",
+      "requirement": "Author can revise and resubmit eligible rejected/returned content",
+      "status": "PASS",
+      "evidence": "DB1 rejected resubmission regression keeps original expiry and awaiting_review privacy/reason history; BROWSER opens populated rejected-author revision form (S4).",
+      "remediation": "S4 MEDIUM fixed: rejected author revision exposed and server-accepted before original expiry.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E06",
+      "requirement": "Approved text edits require another review",
+      "status": "PASS",
+      "evidence": "DB1 reviewed edit returns to queue and hides from peer.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E07",
+      "requirement": "New attachments cannot bypass prior approval",
+      "status": "PASS",
+      "evidence": "DB1 finalized image requeues approved custom post; reviewed state cleared.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E08",
+      "requirement": "Posts can be reported",
+      "status": "PASS",
+      "evidence": "DB1 report persistence/decision tests.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E09",
+      "requirement": "Replies can be reported only if accessible",
+      "status": "PASS",
+      "evidence": "DB1 inaccessible blocked-reply report denial; SOURCE report target guard.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E10",
+      "requirement": "Users can be reported within the event",
+      "status": "PASS",
+      "evidence": "DB1 participant restriction scenario.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E11",
+      "requirement": "Reporting does not itself punish or remove content",
+      "status": "PASS",
+      "evidence": "DB1 open report remains separate from explicit decision.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E12",
+      "requirement": "Dismissal/escalation require review grant",
+      "status": "PASS",
+      "evidence": "DB1 unauthorized decision denial and moderator escalation.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E13",
+      "requirement": "Removal/restriction require additional removal grant",
+      "status": "PASS",
+      "evidence": "DB1 permission tests; SOURCE `report.decide` dual checks.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E14",
+      "requirement": "Restrictions prevent new writes while active",
+      "status": "PASS",
+      "evidence": "DB1 restricted participant post denial; 24-hour rule.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E15",
+      "requirement": "Decision reasons visible to affected user without reporter identity",
+      "status": "PASS",
+      "evidence": "DB1 sanitized safety result test; SOURCE Safety UI.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E16",
+      "requirement": "Moderation actions auditable",
+      "status": "PASS",
+      "evidence": "DB1 audit decision assertions; RLS audit grants.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E17",
+      "requirement": "Block stops peer visibility/interactions",
+      "status": "PASS",
+      "evidence": "DB1 block feed/reply/conversation checks; distinct user preference.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E18",
+      "requirement": "Mute suppresses feed/notifications without becoming a ban",
+      "status": "PASS",
+      "evidence": "DB1 mute retains direct detail access while suppressing delivery.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E19",
+      "requirement": "Block/mute/report have distinct UI controls",
+      "status": "PASS",
+      "evidence": "SOURCE Feed/Preferences; BROWSER privacy/safety navigation.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "E20",
+      "requirement": "Hosted moderation visibility/revocation across real accounts",
+      "status": "BLOCKED",
+      "evidence": "X1; run separate participant/moderator/organizer browser profiles.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X1; run separate participant/moderator/organizer browser profiles."
+    },
+    {
+      "id": "F01",
+      "requirement": "Participant can start a persistent organizer conversation",
+      "status": "PASS",
+      "evidence": "DB1 conversation create/message test.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "F02",
+      "requirement": "Only sender and explicitly authorized staff can read it",
+      "status": "PASS",
+      "evidence": "DB1 peer/outsider/moderator denial versus management grant.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "F03",
+      "requirement": "Replies reference an accessible conversation",
+      "status": "PASS",
+      "evidence": "DB1 private messages; SOURCE conversation visibility check before mutation/replay.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "F04",
+      "requirement": "Message states never claim unperformed delivery",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): SOURCE state `sent`/DB-backed return; UI errors retain input.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1. Communications operator: complete and deliberately fail real private sends; confirm only committed delivery is shown."
+    },
+    {
+      "id": "F05",
+      "requirement": "Conversation history paginated",
+      "status": "PASS",
+      "evidence": "DB1 52 messages return disjoint pages of 50 and 2; outsiders denied at both page offsets; local real SQL, not hosted delivery.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "F06",
+      "requirement": "Conversation read state changes only explicitly",
+      "status": "PASS",
+      "evidence": "DB1 read timestamp test; UI read control.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "F07",
+      "requirement": "Read action retry scope follows selected conversation",
+      "status": "PASS",
+      "evidence": "SOURCE `Messaging.tsx` scope includes selected ID; UI changed-scope regression.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "F08",
+      "requirement": "Official participant-targeted communication",
+      "status": "PASS",
+      "evidence": "DB1 one-recipient snapshot and peer invisibility.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "F09",
+      "requirement": "Official single-team communication",
+      "status": "PASS",
+      "evidence": "DB1 team targeting excludes unrelated members.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "F10",
+      "requirement": "Official multi-team communication",
+      "status": "PASS",
+      "evidence": "DB1 two-team union yields two unique recipients.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "F11",
+      "requirement": "Official event-wide communication",
+      "status": "PASS",
+      "evidence": "DB1 event-scope snapshot test.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "F12",
+      "requirement": "Recipients resolved server-side from trusted membership",
+      "status": "PASS",
+      "evidence": "DB1 wrong-event participant rejection; SQL target/team checks.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "F13",
+      "requirement": "No duplicates from repeated targets or safe retries",
+      "status": "PASS",
+      "evidence": "DB1 unique recipient snapshots/command receipts.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "F14",
+      "requirement": "Notifications belong only to recipient",
+      "status": "PASS",
+      "evidence": "DB1 RLS recipient visibility.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "F15",
+      "requirement": "Read/unread state persists",
+      "status": "PASS",
+      "evidence": "DB1 notification read test; real unread query counts.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "F16",
+      "requirement": "Failed writes do not create misleading notifications",
+      "status": "PASS",
+      "evidence": "DB1 rate-rejected reply leaves notification count unchanged.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "F17",
+      "requirement": "Notification links route to the correct workflow",
+      "status": "PASS",
+      "evidence": "ACCEPTANCE-UI executes all five notification destination mappings using parent destination IDs; opening never marks read. Real delivery remains F20.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "F18",
+      "requirement": "In-app delivery distinguished from email/push",
+      "status": "PASS",
+      "evidence": "SOURCE communications/privacy notice; RUNBOOK limitations.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "F19",
+      "requirement": "External SMS/push/marketing-email delivery",
+      "status": "NOT APPLICABLE",
+      "evidence": "Scope is in-app official communications. Actual Auth confirmation/recovery email remains required at B23/B24.",
+      "remediation": "No change: external marketing/SMS/push is outside in-app scope.",
+      "dependency": "None. Auth confirmation/recovery email is mandatory under B23/B24."
+    },
+    {
+      "id": "F20",
+      "requirement": "Real private message and notification multi-account integration",
+      "status": "BLOCKED",
+      "evidence": "X1. Adapter and SQL tests are not hosted message delivery evidence.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X1. Adapter and SQL tests are not hosted message delivery evidence."
+    },
+    {
+      "id": "G01",
+      "requirement": "Event configuration persists under explicit grant",
+      "status": "PASS",
+      "evidence": "DB1 event update/reopen tests; SOURCE EventSettings.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G02",
+      "requirement": "New event creation requires an existing trusted organizer",
+      "status": "PASS",
+      "evidence": "DB1 create test and participant denial.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G03",
+      "requirement": "Event creation does not add permissions the actor lacks",
+      "status": "PASS",
+      "evidence": "DB1 grant-subset assertion.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G04",
+      "requirement": "Event archive/reopen controlled",
+      "status": "PASS",
+      "evidence": "DB1 lifecycle/role checks; no destructive UI event deletion.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G05",
+      "requirement": "Team creation/rename requires permission",
+      "status": "PASS",
+      "evidence": "DB1 team-save operation; explicit backend grant.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G06",
+      "requirement": "Team assignment requires trusted staff, not self-assertion",
+      "status": "PASS",
+      "evidence": "DB1 participant self-assignment denial and staff assignment.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G07",
+      "requirement": "Revoking membership clears stale team links",
+      "status": "PASS",
+      "evidence": "DB1 revocation assertion; final membership trigger.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G08",
+      "requirement": "CSV parsing uses actual file bytes",
+      "status": "PASS",
+      "evidence": "UI genuine CSV buffer test.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G09",
+      "requirement": "XLSX parsing uses actual workbook bytes",
+      "status": "PASS",
+      "evidence": "UI generated XLSX workbook test; lazy parser.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G10",
+      "requirement": "Import validates emails, names, columns, duplicates and team conflicts",
+      "status": "PASS",
+      "evidence": "UI invalid-row tests; DB1 server validation.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G11",
+      "requirement": "Formulas rejected and exports neutralized",
+      "status": "PASS",
+      "evidence": "UI formula-cell rejection and `safeCsvCell` injection test.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G12",
+      "requirement": "Preview before explicit confirmation",
+      "status": "PASS",
+      "evidence": "BROWSER preview states no writes; SOURCE RosterImport server conflict preview.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G13",
+      "requirement": "Cancel import performs no mutation",
+      "status": "PASS",
+      "evidence": "BROWSER asserts no `roster.import` command.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G14",
+      "requirement": "Import transaction rolls back invalid/conflicting input",
+      "status": "PASS",
+      "evidence": "DB1 transactional import/no partial records.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G15",
+      "requirement": "Real imported/skipped/failed counts and retry result",
+      "status": "PASS",
+      "evidence": "DB1 first/repeat/conflicting imports; SOURCE result/failure display.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G16",
+      "requirement": "Roster records are not fake Auth users or confirmed memberships",
+      "status": "PASS",
+      "evidence": "DB1 auth-user count and pre-registration roster checks.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G17",
+      "requirement": "Confirmed existing identity/team linking uses trusted backend records",
+      "status": "PASS",
+      "evidence": "DB1 email/member link tests; no client-created identity claims.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G18",
+      "requirement": "Roster emails not exposed to participants",
+      "status": "PASS",
+      "evidence": "DB1 restricted roster reads.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "G19",
+      "requirement": "Hosted CSV/XLSX commit, conflicts and resulting team access",
+      "status": "BLOCKED",
+      "evidence": "X1 and real authorized staging roster/test users; no real roster was imported here.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X1 and real authorized staging roster/test users; no real roster was imported here."
+    },
+    {
+      "id": "H01",
+      "requirement": "Actual interactive map implementation, not illustrated SVG geography",
+      "status": "PASS",
+      "evidence": "SOURCE/BROWSER Leaflet map, pan/zoom and raster layer. Live tile delivery H15.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "H02",
+      "requirement": "Production requires explicit approved-provider config",
+      "status": "PASS",
+      "evidence": "FINAL-UI missing/invalid/valid configuration tests; no production OSM fallback.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "H03",
+      "requirement": "Tile failures display honest guidance",
+      "status": "PASS",
+      "evidence": "BROWSER aborts tile requests and observes explicit failure guidance; verifies GPS was not requested. Synthetic transport failure, not a live provider test (H15).",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "H04",
+      "requirement": "Location requested only after user action",
+      "status": "PASS",
+      "evidence": "UI geolocation spy initially untouched; explicit map/posting control.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "H05",
+      "requirement": "Permission denial handled distinctly",
+      "status": "PASS",
+      "evidence": "UI geolocation denied test.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "H06",
+      "requirement": "Timeout/unavailable/inaccurate readings handled",
+      "status": "PASS",
+      "evidence": "UI timeout/accuracy tests; SOURCE unavailable guidance.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "H07",
+      "requirement": "Circle creation with center/radius",
+      "status": "PASS",
+      "evidence": "DB1 saved circle/geometry constraints; SOURCE coordinate/map controls.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "H08",
+      "requirement": "Circle edit persists new geometry/radius",
+      "status": "PASS",
+      "evidence": "DB1 update radius assertion.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "H09",
+      "requirement": "Polygon creation with ordered coordinates",
+      "status": "PASS",
+      "evidence": "DB1 valid PostGIS polygon; UI keyboard coordinate entry.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "H10",
+      "requirement": "Polygon editing persists geometry/name",
+      "status": "PASS",
+      "evidence": "DB1 editable polygon update assertion.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "H11",
+      "requirement": "Malformed/out-of-range/null-radius geometry rejected",
+      "status": "PASS",
+      "evidence": "DB1 dedicated geometry rejection tests.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "H12",
+      "requirement": "Circle containment evaluated server-side",
+      "status": "PASS",
+      "evidence": "DB1 inside/outside/accuracy PostGIS checks.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "H13",
+      "requirement": "Polygon containment evaluated server-side",
+      "status": "PASS",
+      "evidence": "DB1 inside accepted/outside rejected with saved geometry.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "H14",
+      "requirement": "Posting GPS coordinates not retained as history",
+      "status": "PASS",
+      "evidence": "DB1 no longitude/latitude in saved post; SOURCE receipts strip coordinates; privacy notice.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "H15",
+      "requirement": "Licensed real tile delivery and provider policy compliance",
+      "status": "BLOCKED",
+      "evidence": "X4. Leaflet rendering is not actual approved-provider verification.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X4. Leaflet rendering is not actual approved-provider verification."
+    },
+    {
+      "id": "H16",
+      "requirement": "Real-device GPS permission/accuracy and live geofence workflow",
+      "status": "BLOCKED",
+      "evidence": "X1 + X4 + HTTPS frontend. No physical location verification performed.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X1 + X4 + HTTPS frontend. No physical location verification performed."
+    },
+    {
+      "id": "H17",
+      "requirement": "GPS does not claim proof of physical attendance",
+      "status": "PASS",
+      "evidence": "Map/privacy text and RUNBOOK explicitly describe spoofing/inaccuracy.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "I01",
+      "requirement": "Upload path sends actual file bytes to private Storage",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): SOURCE `.storage.upload(file)` and FINAL-UI failed-byte response test. Actual service test I19.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1 + X3. Storage operator: upload real permitted image bytes and verify authenticated byte-for-byte retrieval."
+    },
+    {
+      "id": "I02",
+      "requirement": "Private bucket and exact object path policy",
+      "status": "PASS",
+      "evidence": "DB1 metadata policies; migration bucket is non-public.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "I03",
+      "requirement": "File ownership and post/event authorization",
+      "status": "PASS",
+      "evidence": "DB1 wrong-owner/path/outsider tests.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "I04",
+      "requirement": "Allowed types and maximum size enforced",
+      "status": "PASS",
+      "evidence": "SQL constraints/private bucket rules; UI signature tests; 5 MB, JPEG/PNG/WebP only.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "I05",
+      "requirement": "Filename-only metadata cannot finalize",
+      "status": "PASS",
+      "evidence": "DB1 missing object/verification denial.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "I06",
+      "requirement": "Trusted verifier inspects actual private bytes",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): EDGE/source; validates user/ownership/size/signature before server-only ack. Actual Edge execution I20.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1 + X3. Storage/Edge operator: invoke deployed verifier against real valid, invalid, missing and other-owner bytes."
+    },
+    {
+      "id": "I07",
+      "requirement": "Reservation/finalization retry identity remains stable",
+      "status": "PASS",
+      "evidence": "SOURCE per-file reserve/finalize IDs; DB1 ready-finalization idempotence.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "I08",
+      "requirement": "Ambiguous upload errors do not produce false success",
+      "status": "PASS",
+      "evidence": "FINAL-UI failure never finalizes; SOURCE requires trusted verification.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "I09",
+      "requirement": "Image loading/decoding failures offer retry",
+      "status": "PASS",
+      "evidence": "ACCEPTANCE-UI executes failed download -> retry -> image decode error -> retry -> object-URL cleanup. Adapter-supplied bytes; real Storage I19.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "I10",
+      "requirement": "Authorized viewing uses authenticated byte fetch, not public URL",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): SOURCE `.storage.download` and blob display; DB1 read policies.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1 + X3. Storage operator: verify authenticated download and anonymous/outsider denial on actual objects."
+    },
+    {
+      "id": "I11",
+      "requirement": "Download preference controls offered download action",
+      "status": "PASS",
+      "evidence": "ACCEPTANCE-UI exercises download control both enabled/disabled, including decode failures. This is an offered action preference, not DRM.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "I12",
+      "requirement": "File delete tombstones metadata and denies further eligible fetch",
+      "status": "PASS",
+      "evidence": "DB1 deletion policy checks; SOURCE deletion audit. Physical byte cleanup I21.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "I13",
+      "requirement": "Revoked membership cannot query file metadata",
+      "status": "PASS",
+      "evidence": "DB1 revoked Storage-object visibility test. Actual bytes I19.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "I14",
+      "requirement": "Orphan/pending/deleted object cleanup is server-only and acknowledged after removal",
+      "status": "BLOCKED",
+      "evidence": "Local-only evidence (insufficient for this service requirement): EDGE/source maintenance ordering; DB1 cleanup batch/ack denial to ordinary callers. Actual deletion I21.",
+      "remediation": "Evidence correction: previous PASS overstated adapter/source proof. Implementation retained; execute real-service check.",
+      "dependency": "X1 + X3. Storage operator: run deployed maintenance, inject removal failure, verify acknowledgement occurs only after physical removal."
+    },
+    {
+      "id": "I15",
+      "requirement": "Deleted post/revision content retention implemented",
+      "status": "PASS",
+      "evidence": "DB1 aged deletion and archived retention execute actual maintenance. Post/revision text and decision reasons redacted after configured periods; audit retained. Physical cleanup remains I21.",
+      "remediation": "S7 MEDIUM fixed: current and historical review reasons now follow the existing content-retention window; red/green SQL regression.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "I16",
+      "requirement": "Notification/receipt/counter/archive retention policies specified",
+      "status": "PASS",
+      "evidence": "SOURCE maintenance intervals and privacy/RUNBOOK documentation. Actual scheduled execution I21.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "I17",
+      "requirement": "EXIF, copying, screenshots and retained backups limitations disclosed",
+      "status": "PASS",
+      "evidence": "Account/privacy/attachment UI and RUNBOOK; no impossible erasure promise.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "I18",
+      "requirement": "Account deletion/anonymization request path documented",
+      "status": "PASS",
+      "evidence": "Account settings directs to trusted event operator; no browser service-role mechanism. Operational proof I22.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "I19",
+      "requirement": "Actual private upload/download/outsider/revocation denial",
+      "status": "BLOCKED",
+      "evidence": "X1 + X3. No physical Supabase object server or independent live user JWTs exercised.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X1 + X3. No physical Supabase object server or independent live user JWTs exercised."
+    },
+    {
+      "id": "I20",
+      "requirement": "Deployed verifier valid/invalid/missing/other-owner-byte tests",
+      "status": "BLOCKED",
+      "evidence": "X1 + X3. Type checking does not establish Edge behavior in deployment.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X1 + X3. Type checking does not establish Edge behavior in deployment."
+    },
+    {
+      "id": "I21",
+      "requirement": "Actual scheduled retention and physical object cleanup/retry",
+      "status": "BLOCKED",
+      "evidence": "X3. Must deploy, configure secret/scheduler, execute and verify real deletion/acknowledgement.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X3. Must deploy, configure secret/scheduler, execute and verify real deletion/acknowledgement."
+    },
+    {
+      "id": "I22",
+      "requirement": "Real account anonymization/deletion, backup/audit policy sign-off",
+      "status": "BLOCKED",
+      "evidence": "X1 + X7. Trusted operator and actual project policy/evidence required.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X1 + X7. Trusted operator and actual project policy/evidence required."
+    },
+    {
+      "id": "J01",
+      "requirement": "Abuse controls enforced in database, not just disabled buttons",
+      "status": "PASS",
+      "evidence": "DB1 direct command rate tests.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "J02",
+      "requirement": "Post submission/edit rate limits",
+      "status": "PASS",
+      "evidence": "DB1 post-rule regression.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "J03",
+      "requirement": "Promotion rate limit separate from ordinary posts",
+      "status": "PASS",
+      "evidence": "DB1 category-specific rule test.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "J04",
+      "requirement": "Custom-submission rate limit",
+      "status": "PASS",
+      "evidence": "DB1 category-specific rule test.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "J05",
+      "requirement": "Reply rate limit and rollback",
+      "status": "PASS",
+      "evidence": "DB1 rejected reply/no notification test.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "J06",
+      "requirement": "Report rate limit",
+      "status": "PASS",
+      "evidence": "DB1 distinct-target report-limit test.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "J07",
+      "requirement": "Private-message rate limit",
+      "status": "PASS",
+      "evidence": "DB1 conversation creation rate test.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "J08",
+      "requirement": "Invitation/upload/staff operations call protected limiter",
+      "status": "PASS",
+      "evidence": "DB1 real SQL rate rejection for invitation/upload/staff scopes; PG shared limiter independent-session race. Hosted full-RPC concurrency J17.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "J09",
+      "requirement": "Exact limiter concurrency with independent PostgreSQL sessions",
+      "status": "PASS",
+      "evidence": "PG three tests: 12 clients at limit 3 -> 3 commits/9 rejections; separate event/revocation RLS sessions; serialized target grant-versus-limited-revocation. Production SQL extracted; test auth.uid shim.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "J10",
+      "requirement": "Duplicate request IDs cannot repeat mutation or notification",
+      "status": "PASS",
+      "evidence": "DB1 idempotent post/reply/notification tests.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "J11",
+      "requirement": "Changed payload cannot reuse an old request key",
+      "status": "PASS",
+      "evidence": "DB1 retry receipt checks; UI changed-context key regression.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "J12",
+      "requirement": "Multi-step DB mutations and notifications atomic",
+      "status": "PASS",
+      "evidence": "DB1 failed operation/import rollback assertions.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "J13",
+      "requirement": "Failed form preserves input and supports explicit retry",
+      "status": "PASS",
+      "evidence": "UI failure-input/reused-key test.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "J14",
+      "requirement": "Stale queries cannot expose previous identity data",
+      "status": "PASS",
+      "evidence": "FINAL-UI identity mask; SOURCE canceled-effect/version guards.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "J15",
+      "requirement": "Read errors include retry and empty/permission outcomes are honest",
+      "status": "PASS",
+      "evidence": "QueryState SOURCE/BROWSER; no simulated successes.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "J16",
+      "requirement": "Unexpected rendering failures expose safe recovery",
+      "status": "PASS",
+      "evidence": "ACCEPTANCE-UI injects rendering exception, observes recovery actions and no exception text in DOM. No remote logging claim.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "J17",
+      "requirement": "Hosted concurrent full-RPC/JWT/PostgREST abuse tests",
+      "status": "BLOCKED",
+      "evidence": "X1. Native SQL limiter test does not replace actual API-level races and side-effect checks.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X1. Native SQL limiter test does not replace actual API-level races and side-effect checks."
+    },
+    {
+      "id": "K01",
+      "requirement": "All 15 workflow navigation destinations render",
+      "status": "PASS",
+      "evidence": "BROWSER visits each actual component with adapter data.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K02",
+      "requirement": "Direct invalid/unauthorized workflow page rejected visibly",
+      "status": "PASS",
+      "evidence": "BROWSER participant settings route; SOURCE permission-aware page handling.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K03",
+      "requirement": "Participant interface does not expose organizer tools",
+      "status": "PASS",
+      "evidence": "AUTH route tests; BROWSER restricted page.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K04",
+      "requirement": "Moderator interface shows only assigned staff actions",
+      "status": "PASS",
+      "evidence": "BROWSER limited moderator Reports/no settings/no roster assertions.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K05",
+      "requirement": "Page changes have accessible current state and heading focus",
+      "status": "PASS",
+      "evidence": "BROWSER focused heading; SOURCE `aria-current` and focus management.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K06",
+      "requirement": "Keyboard login interaction works",
+      "status": "PASS",
+      "evidence": "BROWSER Enter submission/error test.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K07",
+      "requirement": "Labels and basic WCAG A/AA automation checked on workflow pages",
+      "status": "PASS",
+      "evidence": "BROWSER axe zero violations on all 15 tested pages; not full certification.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K08",
+      "requirement": "Public/Auth/privacy accessibility baseline",
+      "status": "PASS",
+      "evidence": "BROWSER axe on home/login/register/recovery/privacy.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K09",
+      "requirement": "Text contrast and text-link distinctions corrected",
+      "status": "PASS",
+      "evidence": "BROWSER caught/rechecked contrast and Leaflet link issues; CSS fixes.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K10",
+      "requirement": "Small-screen viewport layout",
+      "status": "PASS",
+      "evidence": "BROWSER 390px overflow checks on 15 pages.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K11",
+      "requirement": "Tablet viewport layout",
+      "status": "PASS",
+      "evidence": "BROWSER 768px overflow checks on 15 pages.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K12",
+      "requirement": "Desktop viewport layout",
+      "status": "PASS",
+      "evidence": "BROWSER 1440px overflow checks on 15 pages.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K13",
+      "requirement": "Loading/error/empty/unavailable states retained",
+      "status": "PASS",
+      "evidence": "AUTH/UI/FINAL-UI and SOURCE QueryState/map/image/error boundary.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K14",
+      "requirement": "Public privacy and protected account settings routes",
+      "status": "PASS",
+      "evidence": "BUILD-BROWSER privacy refresh; DB1 own-profile mutation; SOURCE protected Account route.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K15",
+      "requirement": "Route/workflow code splitting",
+      "status": "PASS",
+      "evidence": "BUILD manifest lazy Workbench/Staff/Messaging.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K16",
+      "requirement": "Heavy map and XLSX parser lazy-loaded",
+      "status": "PASS",
+      "evidence": "BUILD chunk manifest; no eager worksheet parser.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K17",
+      "requirement": "Initial JavaScript budget checked",
+      "status": "PASS",
+      "evidence": "BUILD main 457.70 kB raw / 132.45 kB gzip; under 500 kB entry budget. Not a network-load benchmark.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K18",
+      "requirement": "Fonts no longer require external Google requests",
+      "status": "PASS",
+      "evidence": "BUILD local font assets/index check.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K19",
+      "requirement": "Reusable API/query/forms boundaries retained",
+      "status": "PASS",
+      "evidence": "SOURCE `api.ts`, `forms.tsx`, typed models and modular workflow files; new files formatted.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K20",
+      "requirement": "Rendered strings/tooltips avoid untrusted HTML injection",
+      "status": "PASS",
+      "evidence": "SOURCE React text rendering and map `textContent`; no arbitrary attribution HTML.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "K21",
+      "requirement": "Actual-phone/assistive-tech and final-host performance sign-off",
+      "status": "BLOCKED",
+      "evidence": "X4 + X5; emulated widths/axe and bundle sizes do not prove physical-device/screen-reader/host latency behavior.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X4 + X5; emulated widths/axe and bundle sizes do not prove physical-device/screen-reader/host latency behavior."
+    },
+    {
+      "id": "L01",
+      "requirement": "Full required unit/integration command executed",
+      "status": "PASS",
+      "evidence": "CURRENT commands.json/tests.txt: npm test -- --run, 115/115 across nine files, actual exit 0.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "L02",
+      "requirement": "Required TypeScript command executed",
+      "status": "PASS",
+      "evidence": "`npx tsc --noEmit -p tsconfig.json` exit 0.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "L03",
+      "requirement": "Required production build executed",
+      "status": "PASS",
+      "evidence": "`npm run build` exit 0.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "L04",
+      "requirement": "Required diff whitespace check executed",
+      "status": "PASS",
+      "evidence": "`git diff --check` exit 0.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "L05",
+      "requirement": "Existing isolated DB suites executed",
+      "status": "PASS",
+      "evidence": "CURRENT DB0 10/10 + DB1 46/46; all nine migrations/PostGIS replayed in isolated DB. PG 3/3 separate native-session checks.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "L06",
+      "requirement": "Browser tests executed, not just authored",
+      "status": "PASS",
+      "evidence": "CURRENT browser.txt: 12/12 Chromium tests including actual built SPA fallback, rejected-author revision and tile-failure guidance.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "L07",
+      "requirement": "Both Edge Function sources validated",
+      "status": "PASS",
+      "evidence": "EDGE Deno check exit 0; not a deployed-function test.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "L08",
+      "requirement": "Build outputs checked for lazy chunks and fixture/secret patterns",
+      "status": "PASS",
+      "evidence": "`npm run verify:build` exit 0; bounded spot checks, not formal penetration/secret audit.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "L09",
+      "requirement": "Dependency audit executed",
+      "status": "PASS",
+      "evidence": "CURRENT dependencies.txt: npm audit --json exit 0, zero reported vulnerabilities. No guarantee against unknown vulnerabilities.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "L10",
+      "requirement": "Supabase pgTAP execution",
+      "status": "BLOCKED",
+      "evidence": "X6. Attempted `npm run db:test`; connection refused, no tests ran.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X6. Attempted `npm run db:test`; connection refused, no tests ran."
+    },
+    {
+      "id": "L11",
+      "requirement": "Exact migration/bootstrap/Edge/secret/scheduler runbook",
+      "status": "PASS",
+      "evidence": "RUNBOOK \u00a72\u20133 with explicit safe staging target, no hosted reset.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "L12",
+      "requirement": "Static SPA routing and host security configuration prepared",
+      "status": "PASS",
+      "evidence": "HOSTING verifies exact-origin CSP and nginx snippet inclusion at cache locations (S5); BUILD-BROWSER verifies local SPA fallback. Actual nginx/TLS host remains L16.",
+      "remediation": "S5 MEDIUM fixed: generated security headers included at each nginx add_header location.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "L13",
+      "requirement": "Hosted staging smoke command prepared and safely gated",
+      "status": "PASS",
+      "evidence": "CURRENT hosted-script-syntax.txt exit 0; guard-checks.json/hosted-guard.txt: explicit NO staging-write flag exits 2 before network. No remote request was attempted.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "L14",
+      "requirement": "Production secrets/build-variable separation documented",
+      "status": "PASS",
+      "evidence": "`.env.example`, `.gitignore`, RUNBOOK; no credentials included in deliverables.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "L15",
+      "requirement": "Actual deployment to authorized HTTPS target",
+      "status": "BLOCKED",
+      "evidence": "X5 plus configured backend X1\u2013X3. No deployment credentials/target; no deployment performed.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X5 plus configured backend X1\u2013X3. No deployment credentials/target; no deployment performed."
+    },
+    {
+      "id": "L16",
+      "requirement": "Actual host deep-link refresh/CSP/Auth redirect verification",
+      "status": "BLOCKED",
+      "evidence": "X5 + X2; local Vite fallback and generated headers are not hosted evidence.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X5 + X2; local Vite fallback and generated headers are not hosted evidence."
+    },
+    {
+      "id": "L17",
+      "requirement": "All hosted workflow/security/retention acceptance completed",
+      "status": "BLOCKED",
+      "evidence": "X1\u2013X5 + X7. Execute RUNBOOK \u00a75\u20136 and replace only rows with actual evidence.",
+      "remediation": "Unverified integration, not a demonstrated implementation defect. Execute the specified operator gate.",
+      "dependency": "X1\u2013X5 + X7. Execute RUNBOOK \u00a75\u20136 and replace only rows with actual evidence."
+    },
+    {
+      "id": "L18",
+      "requirement": "Evidence limits and every external blocker disclosed",
+      "status": "PASS",
+      "evidence": "All 236 original IDs/requirements preserved; per-row evidence, remediation and blocked dependencies reconciled; report agrees. Historical reports explicitly separated.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "L19",
+      "requirement": "Safe rollback/forward-fix and cleanup instructions",
+      "status": "PASS",
+      "evidence": "RUNBOOK: previous static release, reviewed DB forward fix, no destructive reset; staging script tombstones its own records.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    },
+    {
+      "id": "L20",
+      "requirement": "Persistent itemized checklist and final decision",
+      "status": "PASS",
+      "evidence": "Current persistent 236-item checklist; conservative external downgrades recorded, no deployment claim. NOT READY FOR LIVE PILOT.",
+      "remediation": "None found in exercised local scope; hosted evidence not implied.",
+      "dependency": "None for stated local scope; mandatory hosted gates remain below."
+    }
+  ]
+}

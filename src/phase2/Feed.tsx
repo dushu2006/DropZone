@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { useApi, useQuery, timestamp } from "./api";
 import type { Overview, Post } from "./api";
@@ -6,6 +6,17 @@ import { ActionForm, PageButtons, QueryState } from "./forms";
 import { templates, validateTemplate } from "./templates";
 import { requestLocation } from "./location";
 import { Attachments } from "./Attachments";
+import { RevisionHistory } from "./Safety";
+function keyDate(key: string, value: unknown) {
+  if (["approximate_time", "valid_until"].includes(key) && value) {
+    const d = new Date(String(value));
+    if (!Number.isNaN(d.getTime()))
+      return new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16);
+  }
+  return String(value);
+}
 export function PostComposer({
   eventId,
   overview,
@@ -23,7 +34,13 @@ export function PostComposer({
   const template = templates.find((t) => t.code === category)!;
   return (
     <section className="workspace-panel">
-      <h2>{revision ? "Revise submission" : "Create a post"}</h2>
+      <h2>
+        {revision
+          ? revision.status === "published"
+            ? "Edit post"
+            : "Revise submission"
+          : "Create a post"}
+      </h2>
       <label className="auth-field">
         <span>Post template</span>
         <select
@@ -95,7 +112,7 @@ export function PostComposer({
                 ...Object.fromEntries(
                   Object.entries(revision.fields).map(([k, v]) => [
                     k,
-                    String(v),
+                    keyDate(k, v),
                   ]),
                 ),
               }
@@ -114,9 +131,14 @@ export function PostComposer({
           if (overview.event?.location_required && !zone)
             throw new Error("Choose a saved event zone.");
           const post = await command<Post>(
-            revision ? "post.revise" : "post.create",
+            revision
+              ? revision.status === "published"
+                ? "post.edit"
+                : "post.revise"
+              : "post.create",
             {
               id: revision?.id ?? null,
+              expected_updated_at: revision?.updated_at ?? null,
               category,
               title: v.title,
               body: v.body,
@@ -146,22 +168,35 @@ export function Feed({
   eventId,
   mode,
   open,
+  zones,
 }: {
   eventId: string;
   mode: "feed" | "activity" | "review";
   open: (id: string) => void;
+  zones: Overview["zones"];
 }) {
   const [search, setSearch] = useState(""),
     [category, setCategory] = useState(""),
     [zone, setZone] = useState(""),
-    [offset, setOffset] = useState(0);
+    [offset, setOffset] = useState(0),
+    [cursors, setCursors] = useState<{ time: string; id: string }[]>([]),
+    [debouncedSearch, setDebouncedSearch] = useState("");
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setDebouncedSearch(search);
+      setCursors([]);
+      setOffset(0);
+    }, 250);
+    return () => window.clearTimeout(timeout);
+  }, [search]);
+  const cursor = offset > 0 ? cursors[offset / 30 - 1] : undefined;
   const query = useQuery<Post[]>(eventId, mode, {
-      search,
-      category,
-      zone_id: zone,
-      offset,
-    }),
-    zones = useQuery<Overview>(eventId, "overview");
+    search: debouncedSearch,
+    category,
+    zone_id: zone,
+    before_time: cursor?.time,
+    before_id: cursor?.id,
+  });
   return (
     <section className="workspace-panel">
       <div className="dz-section-heading">
@@ -172,7 +207,14 @@ export function Feed({
               ? "My activity"
               : "Custom & promotion review"}
         </h2>
-        <button className="secondary-button" onClick={query.refresh}>
+        <button
+          className="secondary-button"
+          onClick={() => {
+            setOffset(0);
+            setCursors([]);
+            query.refresh();
+          }}
+        >
           Refresh
         </button>
       </div>
@@ -193,6 +235,7 @@ export function Feed({
             value={category}
             onChange={(e) => {
               setCategory(e.target.value);
+              setCursors([]);
               setOffset(0);
             }}
           >
@@ -210,11 +253,12 @@ export function Feed({
             value={zone}
             onChange={(e) => {
               setZone(e.target.value);
+              setCursors([]);
               setOffset(0);
             }}
           >
             <option value="">All zones</option>
-            {zones.data?.zones?.map((z) => (
+            {zones.map((z) => (
               <option value={z.id} key={z.id}>
                 {z.name}
               </option>
@@ -249,7 +293,17 @@ export function Feed({
       )}
       <PageButtons
         offset={offset}
-        setOffset={setOffset}
+        setOffset={(next) => {
+          if (next > offset) {
+            const last = query.data?.[query.data.length - 1];
+            if (!last) return;
+            setCursors((old) => [
+              ...old.slice(0, offset / 30),
+              { time: last.created_at, id: last.id },
+            ]);
+          }
+          setOffset(next);
+        }}
         count={Array.isArray(query.data) ? query.data.length : 0}
       />
     </section>
@@ -381,14 +435,22 @@ export function PostDetail({
                   return "Post status updated.";
                 }}
               />
-              {["submitted", "changes_requested"].includes(p.status) && (
-                <button
-                  className="secondary-button"
-                  onClick={() => onRevise(p)}
-                >
-                  Revise requested changes
-                </button>
-              )}
+              {[
+                "submitted",
+                "changes_requested",
+                "published",
+                "rejected",
+              ].includes(p.effective_status) &&
+                new Date(p.expires_at).getTime() > Date.now() && (
+                  <button
+                    className="secondary-button"
+                    onClick={() => onRevise(p)}
+                  >
+                    {p.status === "published"
+                      ? "Edit post"
+                      : "Revise requested changes"}
+                  </button>
+                )}
             </>
           )}
           {!owner && (
@@ -464,9 +526,15 @@ export function PostDetail({
           <Attachments
             eventId={eventId}
             postId={id}
+            onChanged={query.refresh}
             owner={owner}
             downloads={overview.event?.downloads_allowed ?? false}
           />
+          {(owner ||
+            permissions.includes("review_custom_posts") ||
+            permissions.includes("review_reports")) && (
+            <RevisionHistory key={p.updated_at} eventId={eventId} postId={id} />
+          )}
           <h3>Conversation thread</h3>
           <QueryState {...replies} retry={replies.refresh} />
           {replies.data?.map((r) => (

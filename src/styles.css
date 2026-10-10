@@ -1244,3 +1244,30 @@ h1, h2, h3, p { margin-top: 0; }
 }
 .phase1-page-heading h1 { margin: 0 0 6px; color: #2f4738; font: 700 22px/1.25 'Manrope', sans-serif; letter-spacing: -.55px; }
 @media (max-width: 740px) { .phase1-page-heading h1 { font-size: 20px; } }
+
+/* Final accessibility audit: retain the sage palette with legible secondary text. */
+.phase1-app-shell .auth-eyebrow,
+.phase1-app-shell .phase1-sidebar-status,
+.phase1-app-shell .phase1-page-heading p,
+.phase1-app-shell .phase1-notice p,
+.phase1-app-shell .workspace-panel-heading p,
+.phase1-app-shell .workspace-panel dt,
+.phase1-app-shell .permission-list li,
+.phase1-app-shell .empty-permissions,
+.phase1-app-shell .dz-empty,
+.phase1-app-shell .invite-code-result small,
+.auth-page .auth-eyebrow,
+.auth-page .auth-card-heading p,
+.auth-page .auth-card > p,
+.auth-page .auth-card-security,
+.auth-page .auth-field-help,
+.auth-page .auth-field > span small { color: #516456; }
+.auth-page .auth-switch { color: #516456 !important; }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+:focus-visible { outline: 3px solid #9b5b25; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto !important; } }
+.auth-page .landing-hero > p,
+.auth-page .landing-security-note,
+.auth-page .auth-footer { color: #516456; }
+.auth-page p a, .auth-page footer a { text-decoration: underline; }
+.auth-page .auth-back-link { color: #516456; }

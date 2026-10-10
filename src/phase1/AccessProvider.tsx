@@ -50,7 +50,7 @@ export function AccessProvider({ client, children }: { client: SupabaseClient<Da
   const [error, setError] = useState<string | null>(null)
   const requestVersion = useRef(0)
 
-  const refreshAccess = useCallback(async () => {
+  const refreshAccess = useCallback(async (background = false) => {
     const requestVersionForCall = ++requestVersion.current
     const requestedUserId = session?.user.id
     if (!requestedUserId) {
@@ -62,7 +62,7 @@ export function AccessProvider({ client, children }: { client: SupabaseClient<Da
     }
 
     setAccessUserId(requestedUserId)
-    setLoading(true)
+    if (!background) setLoading(true)
     setError(null)
     try {
       const { data, error: rpcError } = await client.rpc('get_my_access')
@@ -98,6 +98,15 @@ export function AccessProvider({ client, children }: { client: SupabaseClient<Da
     }
     void refreshAccess()
   }, [authStatus, session?.user.id, refreshAccess])
+
+  useEffect(() => {
+    if (authStatus !== 'authenticated') return;
+    const refresh = () => { if (document.visibilityState !== 'hidden') void refreshAccess(true); };
+    const interval = window.setInterval(refresh, 60_000);
+    window.addEventListener('focus', refresh);
+    window.addEventListener('dropzone:access-invalidated', refresh);
+    return () => { window.clearInterval(interval); window.removeEventListener('focus', refresh); window.removeEventListener('dropzone:access-invalidated', refresh); };
+  }, [authStatus, refreshAccess]);
 
   const currentUserId = authStatus === 'authenticated' ? session?.user.id ?? null : null
   const accessIsForCurrentUser = currentUserId !== null && accessUserId === currentUserId

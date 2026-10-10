@@ -1,0 +1,82 @@
+
+> dropzone@0.1.0 test
+> vitest run tests/phase2-database.test.ts --run -t rejected submissions
+
+
+ RUN  v5.0.3 /home/user/DropZone
+
+ ❯ tests/phase2-database.test.ts (46 tests | 1 failed | 45 skipped) 10066ms
+   ❯ Phase 2 trusted workflows (isolated PostgreSQL, not hosted Supabase) (46)
+     ↓ enables RLS on every application table and denies anonymous reads/writes
+     ↓ lost_found: validates and persists all structured fields
+     ↓ find_teammate: validates and persists all structured fields
+     ↓ need_resource: validates and persists all structured fields
+     ↓ ask_help: validates and persists all structured fields
+     ↓ offer_resource: validates and persists all structured fields
+     ↓ promotion: validates and persists all structured fields
+     ↓ community_question: validates and persists all structured fields
+     ↓ custom: validates and persists all structured fields
+     ↓ restricts feed, search and category filters to authorized event records
+     ↓ persists replies, notifications, read state, and idempotent retries
+     ↓ distinguishes resolution, expiry and deletion while preserving author history
+     ↓ custom revisions cannot self-publish; staff review records an audit decision
+     ↓ blocks peer interactions, but mute only suppresses feed and notifications
+     ↓ reports persist, require a decision permission, and never imply automatic guilt
+     ↓ organizer conversations are private, paginated and only explicitly marked read
+     ↓ creates teams, prevents self assignment and snapshots targeted recipients
+     ↓ imports transactionally without inventing Auth users, and reports skips/conflicts
+     ↓ validates PostGIS circles, polygons, accuracy and transient posting location
+     ↓ enforces exact private Storage paths and cannot finalize a filename-only upload
+     ↓ rate limits repeated calls at the database and rolls back failed-operation notifications
+     ↓ serializes overlapping rate-limit requests and creates no notification on a failed reply
+     ↓ trusted organizers create and reopen events without granting themselves extra permissions
+     ↓ rejects null-radius circles and out-of-range geometry instead of accepting NULL geofence results
+     ↓ edits published posts with optimistic concurrency and protected revision history
+     ↓ published reviewed content returns to review when edited, and rejection reasons persist
+     ↓ blocks replies to an inaccessible parent, including direct guessed IDs
+     ↓ does not allow a limited role manager to demote an organizer
+     ↓ shows moderation reasons to the affected user without revealing reporter identity
+     ↓ supports individual and multi-team recipient snapshots without duplicate notifications
+     ↓ keyset feed pages remain stable when new posts are inserted
+     ↓ resumes completed attachment finalization and denies access after revocation
+     ↓ updates only the authenticated profile and never role grants
+     ↓ enforces category-specific promotion, post, report and message limits in the database
+     ↓ edits saved circle and polygon geometry through the permission-checked operation
+     ↓ requeues reviewed posts when newly uploaded bytes change their content
+     ↓ evaluates polygon containment server-side without retaining supplied GPS coordinates
+     ↓ rechecks current staff permission before replaying a successful retry receipt
+     ↓ SAMARTHA: invitation, upload and staff operations enforce their own backend limits
+     ↓ SAMARTHA: message pagination remains private across page boundaries
+     ↓ SAMARTHA: archived retention removes private records and stale operational data but preserves audit
+     × SAMARTHA: rejected submissions can be revised without self-publication or lost reasons 104ms
+     ↓ SAMARTHA: expiry never publishes unapproved custom text or attachments
+     ↓ SAMARTHA: expiry preserves approval boundaries for every pending state and edited version
+     ↓ SAMARTHA: an old invitation cannot reactivate a revoked member
+     ↓ revoked memberships lose access to content, conversations and teams immediately
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 45 skipped (46)
+   Start at  12:25:25
+   Duration  10.55s (tests 97%, transform 2%, setup 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/phase2-database.test.ts > Phase 2 trusted workflows (isolated PostgreSQL, not hosted Supabase) > SAMARTHA: rejected submissions can be revised without self-publication or lost reasons
+AssertionError: expected 'Second private reason' to be null
+
+- Expected:
+null
+
++ Received:
+"Second private reason"
+
+ ❯ tests/phase2-database.test.ts:1443:118
+    1441|     await db.query("update public.posts set deleted_at=now()-interval …
+    1442|     await db.exec("select public.dz_maintenance()");
+    1443|     expect((await db.query("select decision_reason from public.posts w…
+       |                                                                                                                      ^
+    1444|     expect((await db.query("select decision_reason from public.post_re…
+    1445|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯

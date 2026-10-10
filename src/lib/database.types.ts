@@ -26,6 +26,7 @@ export type Database = {
     Enums: Record<never, never>;
     CompositeTypes: Record<never, never>;
     Functions: {
+      update_my_profile: Rpc<{ p_name: string }, undefined>;
       get_my_access: Rpc<Record<string, never>, Json>;
       accept_event_invitation: Rpc<{ p_token: string }, { event_id: string }>;
       create_event_invitation: Rpc<

@@ -2,15 +2,23 @@
 
 **A calmer way to get things done, right where you are.**
 
-DropZone is an event-scoped React/Vite application backed solely by Supabase Auth, PostgreSQL/PostGIS and private Storage. Phase 1 identity and authorization are preserved. Phase 2 connects community content, staff workflows, private conversations, notifications, imports, zones and attachments to real backend operations. **Hosted integration remains unverified; nothing has been deployed.**
+DropZone is an event-scoped React/Vite application backed solely by Supabase Auth, PostgreSQL/PostGIS and private Storage. The existing identity, authorization and UI architecture is preserved. Community content, staff workflows, private conversations, notifications, imports, zones and attachments use backend-enforced operations. **Hosted integration remains unverified; nothing has been deployed.**
 
-## Phase 2 workflows
+## Implemented workflows
 
 The authenticated workspaces now include all seven structured post templates plus custom review, feeds/search/threads/lifecycle, reports/block/mute, private organizer conversations, targeted announcements, event/team/staff management, transactional CSV/XLSX roster imports, in-app notifications, interactive Leaflet zones and private image uploads. Counts derive from authorized records. No demo data is seeded.
 
 See [Phase 2 implementation, policies, exact configuration and verification limits](docs/PHASE2.md). In particular, image publication requires the included Supabase verification Edge Function, and physical file cleanup requires the maintenance function and scheduling. A successful frontend build alone does not verify these services.
 
 The preserved prototype uses sample activity only at the explicitly labelled development preview, opt-in with `VITE_ENABLE_DEMO_PREVIEW=true`; it is disabled in production. Never enter real event data there.
+
+## Final delivery and release gate
+
+- [FINAL_ACCEPTANCE_CHECKLIST.md](FINAL_ACCEPTANCE_CHECKLIST.md): item-by-item implementation evidence and external blockers.
+- [Deployment and live verification runbook](docs/DEPLOYMENT.md): safe migration/Edge/bootstrap order, static SPA hosting, security headers, real-service smoke test and operator acceptance.
+- [Final changes and test evidence](docs/FINAL_VERIFICATION.md): reproducible commands, isolated-test limitations and bundle evidence.
+
+Public fonts are self-hosted. Production maps require `VITE_MAP_TILE_URL` and `VITE_MAP_ATTRIBUTION` for an approved HTTPS raster tile provider. Missing map configuration is explicit, not replaced with fabricated geography.
 
 ## Local setup
 
@@ -66,7 +74,7 @@ npm test
 npm run build
 ```
 
-The app itself will intentionally show a configuration error until the two required Supabase browser variables are set. `npm run db:test` runs the pgTAP suite against the local Supabase database and therefore requires `npm run db:start` first. The main `npm test` suite also applies the real migration in an isolated PGlite/PostGIS database and tests RLS without production data.
+The public landing and privacy pages remain accessible without configuration; authentication and private pages fail closed with configuration guidance until the two required Supabase browser variables are set. `npm run db:test` runs the pgTAP suite against the local Supabase database and therefore requires `npm run db:start` first. The main `npm test` suite also applies the real migration in an isolated PGlite/PostGIS database and tests RLS without production data.
 
 ## Authentication and authorization model
 
@@ -89,7 +97,9 @@ The app itself will intentionally show a configuration error until the two requi
 npm run dev          # Vite dev server (0.0.0.0:5173)
 npm run build        # TypeScript project build and production bundle
 npm run preview      # Serve the production bundle
-npm test             # Isolated React/auth/config/Postgres-RLS tests
+npm test             # React/Auth boundaries, PGlite/PostGIS RLS, native PG concurrency
+npm run test:browser # Chromium UI/axe tests; Supabase boundary is a labeled fixture
+npm run verify:build # Check lazy chunks, bundle budget, SPA fallback and header output
 npm run test:watch   # Vitest watch mode
 npm run db:start     # Start local Supabase; Docker or Podman required
 npm run db:reset     # Rebuild local DB from migrations; no seeds

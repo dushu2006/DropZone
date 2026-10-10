@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
+    exclude: ['tests/browser/**', 'node_modules/**', 'dist/**'],
     setupFiles: ['./tests/setup.ts'],
     testTimeout: 30_000,
     hookTimeout: 30_000,

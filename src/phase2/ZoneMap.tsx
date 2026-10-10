@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import type { Zone } from "./api";
 import { errorText, useApi } from "./api";
 import { ActionForm } from "./forms";
+import { mapConfiguration } from "./mapConfig";
 import { requestLocation } from "./location";
 function tooltip(text: string) {
   const node = document.createElement("span");
@@ -37,28 +38,42 @@ export function ZoneMap({
     if (!node.current) return;
     const m = L.map(node.current).setView([20.59, 78.96], 5);
     map.current = m;
-    const url =
-      import.meta.env.VITE_MAP_TILE_URL ||
-      "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-    const tile = L.tileLayer(url, {
-      maxZoom: 19,
-      attribution:
-        import.meta.env.VITE_MAP_ATTRIBUTION || "© OpenStreetMap contributors",
-    }).addTo(m);
-    let tileFailed = false;
-    tile.on("loading", () => {
-      tileFailed = false;
-      setTiles("Loading map tiles…");
-    });
-    tile.on("load", () => {
-      if (!tileFailed) setTiles("");
-    });
-    tile.on("tileerror", () => {
-      tileFailed = true;
-      setTiles(
-        "Map tiles are unavailable. Check your connection or map provider configuration. Coordinate editing remains available.",
-      );
-    });
+    const config = mapConfiguration(
+      {
+        VITE_MAP_TILE_URL: import.meta.env.VITE_MAP_TILE_URL,
+        VITE_MAP_ATTRIBUTION: import.meta.env.VITE_MAP_ATTRIBUTION,
+      },
+      import.meta.env.PROD,
+    );
+    if (config.error || !config.url)
+      setTiles(config.error ?? "Map provider unavailable.");
+    else {
+      const attribution = tooltip(config.attribution ?? "");
+      if (config.url === "https://tile.openstreetmap.org/{z}/{x}/{y}.png") {
+        const link = document.createElement("a");
+        link.href = "https://www.openstreetmap.org/copyright";
+        link.textContent = attribution.textContent;
+        attribution.replaceChildren(link);
+      }
+      const tile = L.tileLayer(config.url, {
+        maxZoom: 19,
+        attribution: attribution.innerHTML,
+      }).addTo(m);
+      let tileFailed = false;
+      tile.on("loading", () => {
+        tileFailed = false;
+        setTiles("Loading map tiles…");
+      });
+      tile.on("load", () => {
+        if (!tileFailed) setTiles("");
+      });
+      tile.on("tileerror", () => {
+        tileFailed = true;
+        setTiles(
+          "Map tiles are unavailable. Check your connection or map provider configuration. Coordinate editing remains available.",
+        );
+      });
+    }
     layer.current = L.layerGroup().addTo(m);
     if (editable)
       m.on("click", (e) =>
