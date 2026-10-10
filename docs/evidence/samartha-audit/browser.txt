@@ -1,0 +1,21 @@
+
+> dropzone@0.1.0 test:browser
+> playwright test
+
+
+Running 12 tests using 1 worker
+
+  ✓   1 tests/browser/production.browser.ts:2:1 › built static bundle serves direct SPA paths and refreshes public privacy without fixtures (410ms)
+  ✓   2 tests/browser/workflows.browser.ts:16:3 › authorized screens render and remain within viewport at 390px (2.3s)
+  ✓   3 tests/browser/workflows.browser.ts:16:3 › authorized screens render and remain within viewport at 768px (1.7s)
+  ✓   4 tests/browser/workflows.browser.ts:16:3 › authorized screens render and remain within viewport at 1440px (2.0s)
+  ✓   5 tests/browser/workflows.browser.ts:54:1 › labels, focus and automated accessibility on real participant/organizer screens (9.4s)
+  ✓   6 tests/browser/workflows.browser.ts:92:1 › public landing, private URL guard and keyboard login interaction (707ms)
+  ✓   7 tests/browser/workflows.browser.ts:112:1 › roster preview can be cancelled without a mutation (897ms)
+  ✓   8 tests/browser/workflows.browser.ts:137:1 › participant cannot open a privileged page and upload UI states remain honest (978ms)
+  ✓   9 tests/browser/workflows.browser.ts:165:1 › moderator navigation exposes only explicitly assigned staff tools (801ms)
+  ✓  10 tests/browser/workflows.browser.ts:183:1 › public authentication and privacy pages have an automated accessibility baseline (3.4s)
+  ✓  11 tests/browser/workflows.browser.ts:206:1 › SAMARTHA: rejected author submission opens a populated revision form (482ms)
+  ✓  12 tests/browser/workflows.browser.ts:224:1 › SAMARTHA: blocked tile requests show honest failure guidance without requesting GPS (849ms)
+
+  12 passed (25.8s)

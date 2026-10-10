@@ -1,0 +1,29 @@
+
+> dropzone@0.1.0 test
+> vitest run --run
+
+
+ RUN  v5.0.3 /home/user/DropZone
+
+ ✓ tests/phase2-database.test.ts (39 tests) 11611ms
+ ✓ tests/database-foundation.test.ts (10 tests) 10118ms
+ ✓ tests/auth-and-routes.test.tsx (20 tests) 3064ms
+   ✓ Supabase authentication lifecycle (12)
+     ✓ registers through Supabase Auth and asks the user to confirm email when no session is issued 392ms
+     ✓ does not expose password update for an expired or missing recovery session 517ms
+     ✓ locks password update immediately when the recovery session expires 522ms
+ ✓ tests/phase2-ui.test.tsx (15 tests) 2701ms
+   ✓ Phase 2 forms, isolated external boundaries (14)
+     ✓ lost_found renders its dedicated fields and submits structured data 348ms
+     ✓ find_teammate renders its dedicated fields and submits structured data 336ms
+ ✓ tests/final-ui.test.tsx (4 tests) 301ms
+ ✓ tests/supabase-config.test.ts (5 tests) 12ms
+ ✓ tests/concurrency.test.ts (1 test) 809ms
+
+ Test Files  7 passed (7)
+      Tests  94 passed (94)
+   Start at  12:05:43
+   Duration  33.57s (tests 87%, environment 7%, setup 2%, import 2%, transform 2%)
+
+    Isolate  7 workers spawned · ~419ms startup each (spawn + environment, per file)
+             at least ~2.51s faster with isolate: false — reuses workers across files instead of one per file

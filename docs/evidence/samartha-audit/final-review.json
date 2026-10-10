@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-10-10T12:34:12.608611+00:00",
+  "command": "Final checklist/report preservation and consistency assertions plus git diff --check",
+  "exitCode": 0,
+  "unchangedOriginalIDsAndRequirements": 236,
+  "counts": {
+    "PASS": 196,
+    "BLOCKED": 39,
+    "NOT APPLICABLE": 1,
+    "FAIL": 0
+  },
+  "allBlockedRowsHaveExactDependencies": true,
+  "allCommandLogsExist": true,
+  "gitDiffCheckExit": 0,
+  "newAuditSourceWhitespaceIssues": [],
+  "branch": "arena/d64443d1-dropzone",
+  "runtimeMatchesExecutedHashes": true
+}

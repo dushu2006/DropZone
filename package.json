@@ -1,0 +1,56 @@
+{
+  "name": "dropzone",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset --local --no-seed",
+    "db:test": "supabase test db --local",
+    "db:push": "supabase db push",
+    "test:browser": "playwright test",
+    "verify:build": "node scripts/verify-build.mjs"
+  },
+  "dependencies": {
+    "@e965/xlsx": "^0.20.3",
+    "@fontsource/dm-sans": "^5.3.0",
+    "@fontsource/manrope": "^5.3.0",
+    "@supabase/supabase-js": "^2.117.3",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.18.4"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@electric-sql/pglite": "^0.5.8",
+    "@electric-sql/pglite-postgis": "^0.2.8",
+    "@playwright/test": "^1.64.0",
+    "@sparticuz/chromium": "^153.0.0",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
+    "@types/leaflet": "^1.9.22",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "embedded-postgres": "^17.10.0-beta.17",
+    "jsdom": "^30.1.2",
+    "pg": "^8.23.1",
+    "supabase": "^2.120.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5",
+    "vitest": "^5.0.3"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

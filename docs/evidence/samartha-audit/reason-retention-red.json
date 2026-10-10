@@ -1,0 +1,6 @@
+{
+  "command": "npm test -- tests/phase2-database.test.ts --run -t rejected submissions",
+  "exitCode": 1,
+  "executedAt": "2026-10-10T12:25:35.966225+00:00",
+  "scope": "New audit reason-retention assertion before adding redaction to maintenance."
+}

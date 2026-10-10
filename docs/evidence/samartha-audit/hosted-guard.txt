@@ -1,0 +1,1 @@
+BLOCKED: explicit staging write consent and configuration required. See docs/DEPLOYMENT.md. Missing: DZ_STAGING_URL, DZ_STAGING_PUBLISHABLE_KEY, DZ_STAGING_EVENT_ID, DZ_PARTICIPANT_TOKEN, DZ_PEER_TOKEN, DZ_OUTSIDER_TOKEN

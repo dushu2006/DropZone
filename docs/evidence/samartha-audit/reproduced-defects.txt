@@ -1,0 +1,137 @@
+
+> dropzone@0.1.0 test
+> vitest run tests/phase2-database.test.ts --run
+
+
+ RUN  v5.0.3 /home/user/DropZone
+
+ ❯ tests/phase2-database.test.ts (41 tests | 2 failed) 11414ms
+   ❯ Phase 2 trusted workflows (isolated PostgreSQL, not hosted Supabase) (41)
+     ✓ enables RLS on every application table and denies anonymous reads/writes 16ms
+     ✓ lost_found: validates and persists all structured fields 34ms
+     ✓ find_teammate: validates and persists all structured fields 14ms
+     ✓ need_resource: validates and persists all structured fields 17ms
+     ✓ ask_help: validates and persists all structured fields 21ms
+     ✓ offer_resource: validates and persists all structured fields 15ms
+     ✓ promotion: validates and persists all structured fields 10ms
+     ✓ community_question: validates and persists all structured fields 7ms
+     ✓ custom: validates and persists all structured fields 10ms
+     ✓ restricts feed, search and category filters to authorized event records 24ms
+     ✓ persists replies, notifications, read state, and idempotent retries 33ms
+     ✓ distinguishes resolution, expiry and deletion while preserving author history 52ms
+     ✓ custom revisions cannot self-publish; staff review records an audit decision 34ms
+     ✓ blocks peer interactions, but mute only suppresses feed and notifications 25ms
+     ✓ reports persist, require a decision permission, and never imply automatic guilt 31ms
+     ✓ organizer conversations are private, paginated and only explicitly marked read 33ms
+     ✓ creates teams, prevents self assignment and snapshots targeted recipients 36ms
+     ✓ imports transactionally without inventing Auth users, and reports skips/conflicts 33ms
+     ✓ validates PostGIS circles, polygons, accuracy and transient posting location 293ms
+     ✓ enforces exact private Storage paths and cannot finalize a filename-only upload 55ms
+     ✓ rate limits repeated calls at the database and rolls back failed-operation notifications 37ms
+     ✓ serializes overlapping rate-limit requests and creates no notification on a failed reply 43ms
+     ✓ trusted organizers create and reopen events without granting themselves extra permissions 57ms
+     ✓ rejects null-radius circles and out-of-range geometry instead of accepting NULL geofence results 9ms
+     ✓ edits published posts with optimistic concurrency and protected revision history 34ms
+     ✓ published reviewed content returns to review when edited, and rejection reasons persist 18ms
+     ✓ blocks replies to an inaccessible parent, including direct guessed IDs 20ms
+     ✓ does not allow a limited role manager to demote an organizer 9ms
+     ✓ shows moderation reasons to the affected user without revealing reporter identity 20ms
+     ✓ supports individual and multi-team recipient snapshots without duplicate notifications 31ms
+     ✓ keyset feed pages remain stable when new posts are inserted 121ms
+     ✓ resumes completed attachment finalization and denies access after revocation 24ms
+     ✓ updates only the authenticated profile and never role grants 14ms
+     ✓ enforces category-specific promotion, post, report and message limits in the database 45ms
+     ✓ edits saved circle and polygon geometry through the permission-checked operation 23ms
+     ✓ requeues reviewed posts when newly uploaded bytes change their content 18ms
+     ✓ evaluates polygon containment server-side without retaining supplied GPS coordinates 37ms
+     ✓ rechecks current staff permission before replaying a successful retry receipt 11ms
+     × SAMARTHA: expiry never publishes unapproved custom text or attachments 46ms
+     × SAMARTHA: an old invitation cannot reactivate a revoked member 24ms
+     ✓ revoked memberships lose access to content, conversations and teams immediately 13ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/phase2-database.test.ts > Phase 2 trusted workflows (isolated PostgreSQL, not hosted Supabase) > SAMARTHA: expiry never publishes unapproved custom text or attachments
+AssertionError: expected { …(18) } to be null
+
+- Expected:
+null
+
++ Received:
+{
+  "author_id": "00000000-0000-4000-8000-000000000001",
+  "author_name": "Updated display name",
+  "body": "Where is the workshop?",
+  "category": "custom",
+  "created_at": "2026-10-10T12:07:50.311+00:00",
+  "decision_reason": null,
+  "deleted_at": null,
+  "effective_status": "expired",
+  "event_id": "00000000-0000-4000-8000-000000000101",
+  "expires_at": "2026-10-10T12:07:49.331+00:00",
+  "fields": {
+    "reason": "Needs private review",
+  },
+  "id": "f23a9912-c54d-416c-9fae-dcae02056ad8",
+  "reviewed_at": null,
+  "reviewed_by": null,
+  "status": "expired",
+  "title": "Workshop question",
+  "updated_at": "2026-10-10T12:07:50.333+00:00",
+  "zone_id": null,
+}
+
+ ❯ tests/phase2-database.test.ts:1239:46
+    1237|     await db.exec('select public.dz_maintenance()');
+    1238|     expect((await read(P,E,'post',{id:p.id})).status).toBe('expired');
+    1239|     expect(await read(Q,E,'post',{id:p.id})).toBeNull();
+       |                                              ^
+    1240|     expect((await as(Q,()=>db.query('select id from public.posts where…
+    1241|     expect(await read(Q,E,'attachments',{id:p.id})).toEqual([]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/phase2-database.test.ts > Phase 2 trusted workflows (isolated PostgreSQL, not hosted Supabase) > SAMARTHA: an old invitation cannot reactivate a revoked member
+AssertionError: promise resolved "{ rows: [ { …(1) } ], …(4) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "affectedRows": 0,
++   "command": "SELECT",
++   "fields": [
++     {
++       "dataTypeID": 3802,
++       "name": "accept_event_invitation",
++     },
++   ],
++   "rowCount": 1,
++   "rows": [
++     {
++       "accept_event_invitation": {
++         "event_id": "00000000-0000-4000-8000-000000000101",
++         "event_name": "Primary event",
++         "event_slug": "first",
++       },
++     },
++   ],
+  }
+
+ ❯ tests/phase2-database.test.ts:1250:91
+    1248|     await as(O,()=>db.query('select public.revoke_event_membership($1,…
+    1249|     try {
+    1250|       await expect(as(Q,()=>db.query('select public.accept_event_invit…
+       |                                                                                           ^
+    1251|       expect((await db.query<{status:string}>('select status from publ…
+    1252|     } finally { await db.query("update public.event_memberships set st…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 39 passed (41)
+   Start at  12:07:38
+   Duration  11.84s (tests 97%, transform 1%, setup 1%)

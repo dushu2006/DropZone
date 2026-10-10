@@ -1,0 +1,74 @@
+[
+  {
+    "id": "secret-build-guard",
+    "command": "npm run build",
+    "environmentOverride": {
+      "VITE_SUPABASE_PUBLISHABLE_KEY": "sb_secret_ISOLATED_AUDIT_SENTINEL_NOT_A_KEY"
+    },
+    "startedAt": "2026-10-10T12:33:26.864698+00:00",
+    "exitCode": 1,
+    "expectedExit": 1,
+    "log": "secret-build-guard.txt"
+  },
+  {
+    "id": "unused-env-build",
+    "command": "npm run build",
+    "environmentOverride": {
+      "VITE_AUDIT_UNUSED_SETTING": "ISOLATED_UNUSED_ENV_SENTINEL"
+    },
+    "startedAt": "2026-10-10T12:33:34.365058+00:00",
+    "exitCode": 0,
+    "expectedExit": 0,
+    "log": "unused-env-build.txt"
+  },
+  {
+    "id": "hosted-guard",
+    "command": "node scripts/verify-hosted.mjs",
+    "environmentOverride": {
+      "DZ_ALLOW_STAGING_WRITES": "NO"
+    },
+    "startedAt": "2026-10-10T12:33:47.822997+00:00",
+    "exitCode": 2,
+    "expectedExit": 2,
+    "log": "hosted-guard.txt"
+  },
+  {
+    "id": "unused-env-proof",
+    "result": "Unused setting is absent from every JS chunk; every dist file is byte-identical to final broadly tested build. No real secret used.",
+    "exitCode": 0,
+    "artifactSha256": {
+      "_redirects": "91c807a4e97685ce2db9b339f890433d4515069e8d5aa3ddfe224187fea6bc32",
+      "nginx-security-headers.conf": "b0e5c852ce1e6329e7cc0211455793e58659bc4660c3499a05bc8ed1ff72e7fb",
+      "_headers": "7f57408449a9493b649f5a018f93075d51efb52736613eee041936857740dd51",
+      "index.html": "d3e261511e40b654f1406fa4e54dead64d48068d4453de95e82e803003114bf5",
+      "assets/dm-sans-latin-400-normal-CW0RaeGs.woff2": "4ab51eb2cd7305d177187908d6397474d4520663f6c6e572feb0a64f4fa80006",
+      "assets/dm-sans-latin-500-normal-B9HHJjqV.woff2": "19bf1984956517c35c2bd35b6cdedac12a21d6fcd3596c614ecdfb88b648909d",
+      "assets/dm-sans-latin-700-normal-DvUfVpUG.woff2": "35c5efa0e5daa52ee5c6500f5be354bf751fb65c4e49e1d6806c6eb5883e8fe9",
+      "assets/manrope-latin-400-normal-PaqtzbVb.woff2": "849290ef12a2eeb9af5c11924120d11aa4ae8b435ed3347d7fc8bc240c293ca3",
+      "assets/manrope-latin-500-normal-BYYD-dBL.woff2": "19874318747181a650eda439c37955220b849d9c4797c9e0718ee67d4bf929bc",
+      "assets/manrope-latin-600-normal-4f0koTD-.woff2": "f7ac6258da20ab7541939b59851155753d1d24f1b30cbcb949077a3faa3d1593",
+      "assets/manrope-latin-700-normal-BZp_XxE4.woff2": "d2a12c85a831e4b5db341767d0347fa3d1361d22a1fcb3e361a16b6c90080f71",
+      "assets/manrope-latin-800-normal-BfWYOv1c.woff2": "74c161dbcbce7c3590803cc72dc1f63313c360e13367aba5075a7b7b3818ea49",
+      "assets/dm-sans-latin-600-normal-Aqo67rzb.woff2": "6bb2b2645ba5eeaecf56322c543fa3a75b87b927977b9c03b1dabc4205089120",
+      "assets/dm-sans-latin-400-normal-BwCSEQnW.woff": "38702875fe179437d200e7ba6f7fab4d497ffe48117ef332029b2081751186ad",
+      "assets/dm-sans-latin-500-normal-Dr3UlScf.woff": "7deb957e430b780ee3272d801af4f9f2211b1330ec40a312a8f25309eacb4034",
+      "assets/dm-sans-latin-700-normal-CUSSCpQX.woff": "af422a448ac00679a8dbb13532db3616829c5a35b58d3eeea5903ce17ad2e36a",
+      "assets/manrope-latin-400-normal-8tf8FM3T.woff": "1bf66c29a29f1b71d507cb97fc138cd130b856ed05b55decd3a2944b413cb636",
+      "assets/manrope-latin-500-normal-DMZssgOp.woff": "c805ac8fd73fb95ddba74e624500c7d7d9a8ec6434d723bb6a9b76173c9e41b4",
+      "assets/manrope-latin-600-normal-BqgrALkZ.woff": "8d1f509774bca963fa02faf674678ce9244474306361ca2798583fa600346df6",
+      "assets/manrope-latin-700-normal-DGRFkw-m.woff": "e5d35fda4759b0d63ebcc6cca0627d98d9208254ce851c85df29e4d12aeafb61",
+      "assets/manrope-latin-800-normal-uHUdIJgA.woff": "ce954acb78379d559111a15d29925f3390b69161b2b1365c38b0f19c76991bac",
+      "assets/dm-sans-latin-600-normal-BmdmIIQ2.woff": "e7351257e49400eff05aca30a2007289194a900860d30c30770d8b8732897564",
+      "assets/index-BJhoq5yB.css": "26d5f362047f9fba37f868534928ece0371f9f481fc7571dd75595eac7e1e9b6",
+      "assets/Workbench-DXwC9Rhe.css": "69f2d03e5305c312033a94d518dcc70ed8d4dcd0d0cf0a66d4edf85d2f118d13",
+      "assets/ZoneMap-CIGW-MKW.css": "fcd9fbeec3e87013f776847f0e76395d4d7eba07d982964933a41bd07503e6fe",
+      "assets/index-BCrd24Nr.js": "a43e0dc12093c8e3b2b817163eeee8126278a4816f6b81e09a72ad6cbe43085c",
+      "assets/Workbench-BAogQTgO.js": "d698b849e700e7f5a175e464cea6b2f3954867e911c71e50fe09e3ec7681f691",
+      "assets/ZoneMap-CrX3Vhq1.js": "d2dadbfe036ec63adf5c35c422302ba0cfc2bc7a25fef86fa54f34a0918255e8",
+      "assets/Staff-B6DCruPf.js": "b5f542db8f855a87405e3efb6bb9b6c830d7b869ba37d461cef6e1d5c4cc00a9",
+      "assets/Messaging-pqwi7gl0.js": "31155edbd5862765f4277eba03858f2b3a6406d74386dfc2d88ef3be2884cbae",
+      "assets/xlsx-D9UGuzH6.js": "25cd13befe264621e2bba2f0c08695063ddf6a4428955442298797f8fed4c034",
+      ".vite/manifest.json": "5c7b0d9bb8f35a1ee739a3609060878db2e1b617850aabeed0f3da3e643fbdb5"
+    }
+  }
+]

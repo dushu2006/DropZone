@@ -1,0 +1,5 @@
+
+> dropzone@0.1.0 verify:build
+> node scripts/verify-build.mjs
+
+PASS: lazy routes/map, initial bundle budget, fixture/secret spot checks, self-hosted fonts, SPA fallback and security headers
