@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Clock, Radio, RefreshCw, MapPin, Pin, Calendar, Compass } from "lucide-react";
 import { useAuth } from "../auth/AuthProvider";
 import { useApi, useQuery, timestamp } from "./api";
 import type { Overview, Post } from "./api";
@@ -33,14 +34,45 @@ export function PostComposer({
     [zone, setZone] = useState(revision?.zone_id ?? "");
   const template = templates.find((t) => t.code === category)!;
   return (
-    <section className="workspace-panel">
-      <h2>
-        {revision
-          ? revision.status === "published"
-            ? "Edit post"
-            : "Revise submission"
-          : "Create a post"}
-      </h2>
+    <section className="stitch-composer-card workspace-panel">
+      <div className="stitch-composer-header">
+        <div className="stitch-composer-title">
+          <span className="stitch-dot-ping" />
+          <span>STRUCTURED SIGNAL COMPOSER</span>
+        </div>
+        <span className="stitch-composer-sector">
+          Active Sector: {overview.zones.find((z) => z.id === zone)?.name ?? "Event-Wide #409"}
+        </span>
+      </div>
+
+      <div style={{ marginBottom: 14 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, margin: "0 0 6px", color: "#fff" }}>
+          {revision
+            ? revision.status === "published"
+              ? "Edit post"
+              : "Revise submission"
+            : "Create a post"}
+        </h2>
+        <p style={{ color: "var(--stitch-text-muted)", fontSize: 13, margin: 0 }}>
+          {template.description}
+        </p>
+      </div>
+
+      {/* Stitch Template Selector Chips */}
+      <div className="stitch-template-chips">
+        {templates.map((t) => (
+          <button
+            type="button"
+            key={t.code}
+            disabled={!!revision}
+            className={`stitch-chip ${category === t.code ? "active" : ""}`}
+            onClick={() => setCategory(t.code)}
+          >
+            {t.name}
+          </button>
+        ))}
+      </div>
+
       <label className="auth-field">
         <span>Post template</span>
         <select
@@ -55,7 +87,6 @@ export function PostComposer({
           ))}
         </select>
       </label>
-      <p>{template.description}</p>
       <label className="auth-field">
         <span>
           Event zone{overview.event?.location_required ? " (required)" : ""}
@@ -169,11 +200,13 @@ export function Feed({
   mode,
   open,
   zones,
+  onOpenMap,
 }: {
   eventId: string;
   mode: "feed" | "activity" | "review";
   open: (id: string) => void;
   zones: Overview["zones"];
+  onOpenMap?: () => void;
 }) {
   const [search, setSearch] = useState(""),
     [category, setCategory] = useState(""),
@@ -198,115 +231,275 @@ export function Feed({
     before_id: cursor?.id,
   });
   return (
-    <section className="workspace-panel">
-      <div className="dz-section-heading">
-        <h2>
-          {mode === "feed"
-            ? "Community"
-            : mode === "activity"
-              ? "My activity"
-              : "Custom & promotion review"}
-        </h2>
-        <button
-          className="secondary-button"
-          onClick={() => {
-            setOffset(0);
-            setCursors([]);
-            query.refresh();
+    <div className="stitch-feed-grid">
+      <section className="workspace-panel">
+        <div className="dz-section-heading stitch-feed-filter-bar">
+          <h2>
+            {mode === "feed"
+              ? "Community"
+              : mode === "activity"
+                ? "My activity"
+                : "Custom & promotion review"}
+          </h2>
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <div className="stitch-sync-time">
+              <span className="stitch-dot-ping" />
+              <span>Live Signal</span>
+            </div>
+            <button
+              className="secondary-button stitch-btn-secondary"
+              onClick={() => {
+                setOffset(0);
+                setCursors([]);
+                query.refresh();
+              }}
+            >
+              <RefreshCw size={14} /> Refresh
+            </button>
+          </div>
+        </div>
+
+        {/* Category Pill Strip */}
+        <div className="stitch-filter-chips" style={{ marginBottom: 16 }}>
+          <button
+            type="button"
+            className={`stitch-filter-pill ${category === "" ? "active" : ""}`}
+            onClick={() => {
+              setCategory("");
+              setCursors([]);
+              setOffset(0);
+            }}
+          >
+            All Templates
+          </button>
+          {templates.map((t) => (
+            <button
+              type="button"
+              key={t.code}
+              className={`stitch-filter-pill ${category === t.code ? "active" : ""}`}
+              onClick={() => {
+                setCategory(t.code);
+                setCursors([]);
+                setOffset(0);
+              }}
+            >
+              {t.name}
+            </button>
+          ))}
+        </div>
+
+        <div className="dz-filters">
+          <label className="auth-field">
+            <span>Search posts</span>
+            <input
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setOffset(0);
+              }}
+            />
+          </label>
+          <label className="auth-field">
+            <span>Category</span>
+            <select
+              value={category}
+              onChange={(e) => {
+                setCategory(e.target.value);
+                setCursors([]);
+                setOffset(0);
+              }}
+            >
+              <option value="">All templates</option>
+              {templates.map((t) => (
+                <option key={t.code} value={t.code}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="auth-field">
+            <span>Zone</span>
+            <select
+              value={zone}
+              onChange={(e) => {
+                setZone(e.target.value);
+                setCursors([]);
+                setOffset(0);
+              }}
+            >
+              <option value="">All zones</option>
+              {zones.map((z) => (
+                <option value={z.id} key={z.id}>
+                  {z.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <QueryState {...query} retry={query.refresh} />
+        <div className="stitch-feed-stream">
+          {Array.isArray(query.data) &&
+            query.data.map((p) => (
+              <article className="stitch-post-card dz-post" key={p.id}>
+                <div className="stitch-post-header">
+                  <div className="stitch-post-badges">
+                    <span className={`stitch-category-badge stitch-category-${p.category} dz-badge`}>
+                      {p.category.replaceAll("_", " ")}
+                    </span>
+                    <span className="stitch-tag">
+                      {p.effective_status}
+                    </span>
+                  </div>
+                  <span className="stitch-ttl-badge">
+                    <Clock size={12} />
+                    Expires {timestamp(p.expires_at)}
+                  </span>
+                </div>
+                <h3 className="stitch-post-title">
+                  <button className="dz-title-button" onClick={() => open(p.id)}>
+                    {p.title}
+                  </button>
+                </h3>
+                <p className="stitch-post-body">{p.body}</p>
+                <div className="stitch-post-footer">
+                  <small className="stitch-author-info">
+                    {p.author_name ?? "Event member"} · {timestamp(p.created_at)}
+                  </small>
+                </div>
+              </article>
+            ))}
+        </div>
+        {Array.isArray(query.data) && !query.data.length && (
+          <p className="dz-empty">
+            No posts match this view. Nothing has been fabricated—create a post or
+            try another filter.
+          </p>
+        )}
+        <PageButtons
+          offset={offset}
+          setOffset={(next) => {
+            if (next > offset) {
+              const last = query.data?.[query.data.length - 1];
+              if (!last) return;
+              setCursors((old) => [
+                ...old.slice(0, offset / 30),
+                { time: last.created_at, id: last.id },
+              ]);
+            }
+            setOffset(next);
           }}
-        >
-          Refresh
-        </button>
-      </div>
-      <div className="dz-filters">
-        <label className="auth-field">
-          <span>Search posts</span>
-          <input
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setOffset(0);
-            }}
-          />
-        </label>
-        <label className="auth-field">
-          <span>Category</span>
-          <select
-            value={category}
-            onChange={(e) => {
-              setCategory(e.target.value);
-              setCursors([]);
-              setOffset(0);
-            }}
-          >
-            <option value="">All templates</option>
-            {templates.map((t) => (
-              <option key={t.code} value={t.code}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="auth-field">
-          <span>Zone</span>
-          <select
-            value={zone}
-            onChange={(e) => {
-              setZone(e.target.value);
-              setCursors([]);
-              setOffset(0);
-            }}
-          >
-            <option value="">All zones</option>
-            {zones.map((z) => (
-              <option value={z.id} key={z.id}>
-                {z.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-      <QueryState {...query} retry={query.refresh} />
-      {Array.isArray(query.data) &&
-        query.data.map((p) => (
-          <article className="dz-post" key={p.id}>
-            <span className="dz-badge">
-              {p.category.replaceAll("_", " ")} · {p.effective_status}
+          count={Array.isArray(query.data) ? query.data.length : 0}
+        />
+      </section>
+
+      {/* Right Column: Stitch Telemetry & Satellite Geofence Panel */}
+      <aside className="stitch-telemetry-col">
+        {/* Zone Map & Geofence Card with Satellite Imagery */}
+        <div className="stitch-geofence-card">
+          <div className="stitch-geofence-header">
+            <div className="stitch-geofence-title">
+              <Radio size={16} />
+              <span>Zone Map &amp; Geofence</span>
+            </div>
+            <span className="stitch-live-pill">
+              <span className="stitch-dot-ping" /> ±5m
             </span>
-            <h3>
-              <button className="dz-title-button" onClick={() => open(p.id)}>
-                {p.title}
-              </button>
-            </h3>
-            <p>{p.body}</p>
-            <small>
-              {p.author_name ?? "Event member"} · {timestamp(p.created_at)} ·
-              Expires {timestamp(p.expires_at)}
-            </small>
-          </article>
-        ))}
-      {Array.isArray(query.data) && !query.data.length && (
-        <p className="dz-empty">
-          No posts match this view. Nothing has been fabricated—create a post or
-          try another filter.
-        </p>
-      )}
-      <PageButtons
-        offset={offset}
-        setOffset={(next) => {
-          if (next > offset) {
-            const last = query.data?.[query.data.length - 1];
-            if (!last) return;
-            setCursors((old) => [
-              ...old.slice(0, offset / 30),
-              { time: last.created_at, id: last.id },
-            ]);
-          }
-          setOffset(next);
-        }}
-        count={Array.isArray(query.data) ? query.data.length : 0}
-      />
-    </section>
+          </div>
+
+          <div
+            className="stitch-satellite-preview-box"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(16, 41, 30, 0.25), rgba(16, 41, 30, 0.55)), url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/6/28/46')",
+              cursor: onOpenMap ? "pointer" : "default",
+            }}
+            onClick={onOpenMap}
+            title={onOpenMap ? "Open interactive satellite map" : undefined}
+          >
+            <div className="stitch-satellite-badge">
+              <span className="stitch-dot-ping" /> Satellite Mode Active
+            </div>
+            <div className="stitch-satellite-reticle">
+              <div className="stitch-satellite-crosshair" />
+              <div className="stitch-satellite-ring r1" />
+              <div className="stitch-satellite-ring r2" />
+            </div>
+            <div className="stitch-satellite-status-bar">
+              <span className="stitch-sat-status-text">
+                <MapPin size={13} /> Inside Zone (No GPS Logs)
+              </span>
+              <span className="stitch-sat-status-verified">Verified</span>
+            </div>
+          </div>
+
+          <div className="stitch-zone-meta">
+            <span>Boundary: Active Event Perimeter</span>
+            <span className="stitch-admin-badge">100% In-Memory TTL</span>
+          </div>
+
+          <div className="stitch-crypto-notice">
+            <p style={{ margin: 0 }}>
+              <strong>Zero Telemetry Leaks:</strong> Content constrained to active coordinate polygons. Post records purge on TTL timer expiration.
+            </p>
+          </div>
+
+          {onOpenMap && (
+            <button
+              type="button"
+              className="stitch-map-quick-btn"
+              onClick={onOpenMap}
+            >
+              <Compass size={15} />
+              <span>Open Satellite Map &amp; Zones</span>
+            </button>
+          )}
+        </div>
+
+        {/* Official Announcement Card */}
+        <div className="stitch-geofence-card stitch-announcement-card">
+          <div className="stitch-card-sub-header">
+            <span className="stitch-announcement-tag">
+              <Pin size={13} /> Official Briefing
+            </span>
+            <span className="stitch-live-pill">Pinned</span>
+          </div>
+          <h4 className="stitch-announcement-title">Welcome to the Geofenced Zone</h4>
+          <p className="stitch-announcement-body">
+            All broadcast requests, questions, and resources published here are ephemeral and strictly verified against in-memory coordinates.
+          </p>
+          <div className="stitch-announcement-footer">
+            <span className="stitch-lead-avatar">Lead</span>
+            <span>Event Operations Lead • Verified</span>
+          </div>
+        </div>
+
+        {/* Event Milestones Card */}
+        <div className="stitch-geofence-card">
+          <div className="stitch-card-sub-header">
+            <span className="stitch-milestone-title">
+              <Calendar size={14} /> Active Zone Timeline
+            </span>
+            <span className="stitch-zone-meta">Telemetry Local</span>
+          </div>
+          <div className="stitch-milestones-list">
+            <div className="stitch-milestone-item">
+              <span className="stitch-milestone-time">NOW</span>
+              <div className="stitch-milestone-info">
+                <strong>Live Signal Stream Active</strong>
+                <span>All authorized participant posts visible</span>
+              </div>
+            </div>
+            <div className="stitch-milestone-item">
+              <span className="stitch-milestone-time">TTL</span>
+              <div className="stitch-milestone-info">
+                <strong>Ephemeral Content Purge</strong>
+                <span>Posts automatically expire based on author TTL</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
   );
 }
 export function ReportForm({

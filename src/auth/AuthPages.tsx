@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, CheckCircle2, LockKeyhole, ShieldCheck } from 'lucide-react'
 import type { AuthError } from '@supabase/supabase-js'
 import { useAuth } from './AuthProvider'
@@ -15,7 +15,10 @@ function describeAuthError(error: unknown) {
   }
   if (authError.status === 429) return 'Too many attempts. Wait a little while and try again.'
   if (authError.status === 400 && /email not confirmed/i.test(authError.message ?? '')) {
-    return 'Confirm your email from the message we sent before signing in.'
+    return 'Confirm your email before signing in, or disable email confirmation in your development Supabase project settings.'
+  }
+  if (/otp_expired|token.*expired|link.*expired/i.test(authError.message ?? '')) {
+    return 'The authentication link has expired or is invalid. Request a new link or log in.'
   }
   return authError.message || 'Authentication could not be completed. Please try again.'
 }
@@ -32,11 +35,55 @@ export function LandingContent() {
   return <main className="auth-page landing-page">
     <header className="auth-topbar"><DropZoneBrand /><nav><Link className="auth-nav-link" to="/login">Log in</Link><Link className="primary-button" to="/register">Create account <ArrowRight size={16} /></Link></nav></header>
     <section className="landing-hero">
-      <span className="auth-eyebrow"><span /> EVENT COMMUNITIES, TOGETHER</span>
-      <h1>Find your people.<br /><span>Make the moment easier.</span></h1>
-      <p>DropZone helps verified event members connect, share what they need, and find the right people nearby.</p>
-      <div className="landing-actions"><Link className="primary-button landing-primary" to="/login">Log in to DropZone <ArrowRight size={17} /></Link><Link className="landing-secondary" to="/register">Create an account</Link></div>
-      <div className="landing-security-note"><LockKeyhole size={15} /><span>Private event spaces are available only to accounts with an active event membership.</span></div>
+      <div className="landing-copy">
+        <span className="auth-eyebrow"><span /> EVENT COMMUNITIES, TOGETHER</span>
+        <h1>Find your people.<br /><span>Make the moment easier.</span></h1>
+        <p>DropZone helps verified event members connect, share what they need, and find the right people nearby.</p>
+        <div className="landing-actions"><Link className="primary-button landing-primary" to="/login">Log in to DropZone <ArrowRight size={17} /></Link><Link className="landing-secondary" to="/register">Create an account</Link></div>
+        <div className="landing-security-note"><LockKeyhole size={15} /><span>Private event spaces are available only to accounts with an active event membership.</span></div>
+      </div>
+      <div className="landing-visual" aria-label="DropZone overview cards">
+        <div className="landing-card landing-card-top">
+          <div className="mini-stat">
+            <span>Live event</span>
+            <strong>142 members</strong>
+          </div>
+          <div className="mini-stack" aria-hidden="true">
+            <span className="avatar avatar-sm avatar-green">A</span>
+            <span className="avatar avatar-sm avatar-violet">M</span>
+            <span className="avatar avatar-sm avatar-amber">S</span>
+          </div>
+        </div>
+        <div className="landing-card landing-card-mid">
+          <span className="card-kicker">This week</span>
+          <ul>
+            <li>Quiet check-ins</li>
+            <li>Map-linked prompts</li>
+            <li>Staff review queues</li>
+          </ul>
+        </div>
+        <div className="landing-card landing-card-bottom">
+          <span className="status-pill"><span />Secure access</span>
+          <strong>Verified only</strong>
+        </div>
+      </div>
+    </section>
+    <section className="landing-showcase" aria-label="How DropZone works">
+      <article className="landing-feature">
+        <span className="feature-icon">01</span>
+        <h2>Private event access</h2>
+        <p>Members enter only through verified memberships, so public browsing stays clear and trustworthy.</p>
+      </article>
+      <article className="landing-feature">
+        <span className="feature-icon">02</span>
+        <h2>Calm communication</h2>
+        <p>Share updates, alerts, and handoffs in one clean stream without sensory overload.</p>
+      </article>
+      <article className="landing-feature">
+        <span className="feature-icon">03</span>
+        <h2>Operational clarity</h2>
+        <p>Organizers can review requests, manage teams, and keep event context in one place.</p>
+      </article>
     </section>
     <footer className="auth-footer">A calmer way to get things done, right where you are. <Link to="/privacy">Privacy notice</Link></footer>
   </main>
@@ -218,11 +265,137 @@ export function ResetPasswordPage() {
   </AuthFrame>
 }
 
+export function clearAuthUrlParams() {
+  if (typeof window === 'undefined') return
+  try {
+    const url = new URL(window.location.href)
+    const authParams = ['code', 'error', 'error_code', 'error_description', 'type']
+    let modified = false
+    for (const param of authParams) {
+      if (url.searchParams.has(param)) {
+        url.searchParams.delete(param)
+        modified = true
+      }
+    }
+    if (url.hash) {
+      url.hash = ''
+      modified = true
+    }
+    if (modified) {
+      const cleanPath = url.pathname + (url.search ? url.search : '')
+      window.history.replaceState(window.history.state, '', cleanPath)
+    }
+  } catch {
+    // Ignore in non-browser testing environments
+  }
+}
+
 export function AuthCallbackPage() {
-  const { status, error } = useAuth()
+  const { client, status, error: authError, retrySession } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [callbackError, setCallbackError] = useState<string | null>(null)
+  const [processing, setProcessing] = useState(true)
+  const handledRef = useRef(false)
+
+  useEffect(() => {
+    if (handledRef.current) return
+    handledRef.current = true
+    let mounted = true
+
+    const handleCallback = async () => {
+      const searchStr = location.search || (typeof window !== 'undefined' ? window.location.search : '')
+      const rawHash = location.hash || (typeof window !== 'undefined' ? window.location.hash : '')
+      const hashStr = rawHash.startsWith('#') ? rawHash.slice(1) : rawHash
+
+      const searchParams = new URLSearchParams(searchStr)
+      const hashParams = new URLSearchParams(hashStr)
+
+      const error = searchParams.get('error') || hashParams.get('error')
+      const errorDescription = searchParams.get('error_description') || hashParams.get('error_description')
+      const errorCode = searchParams.get('error_code') || hashParams.get('error_code')
+
+      if (error || errorDescription || errorCode) {
+        clearAuthUrlParams()
+        if (mounted) {
+          setProcessing(false)
+          setCallbackError(
+            errorDescription
+              ? decodeURIComponent(errorDescription.replace(/\+/g, ' '))
+              : 'The authentication link could not be completed. Request a fresh link or sign in.'
+          )
+        }
+        return
+      }
+
+      const code = searchParams.get('code')
+      if (code && typeof client.auth.exchangeCodeForSession === 'function') {
+        try {
+          const { error: exchangeError } = await client.auth.exchangeCodeForSession(code)
+          if (exchangeError) {
+            const { data: sessionData } = await client.auth.getSession()
+            if (!sessionData.session) throw exchangeError
+          }
+          clearAuthUrlParams()
+          await retrySession()
+          if (mounted) {
+            setProcessing(false)
+            navigate('/app', { replace: true })
+          }
+          return
+        } catch (caught) {
+          clearAuthUrlParams()
+          if (mounted) {
+            setProcessing(false)
+            setCallbackError(describeAuthError(caught))
+          }
+          return
+        }
+      }
+
+      try {
+        const { data: sessionData } = await client.auth.getSession()
+        if (sessionData.session) {
+          clearAuthUrlParams()
+          await retrySession()
+          if (mounted) {
+            setProcessing(false)
+            navigate('/app', { replace: true })
+          }
+          return
+        }
+      } catch {
+        // Fall through
+      }
+
+      clearAuthUrlParams()
+      if (mounted) {
+        setProcessing(false)
+      }
+    }
+
+    void handleCallback()
+
+    return () => {
+      mounted = false
+    }
+  }, [client, navigate, retrySession])
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      clearAuthUrlParams()
+      navigate('/app', { replace: true })
+    }
+  }, [status, navigate])
+
   if (status === 'authenticated') return <Navigate to="/app" replace />
-  if (status === 'anonymous' || status === 'error') return <AuthFrame eyebrow="SECURE SIGN-IN" title="Link expired or invalid" subtitle={error ?? 'The authentication link could not be completed. Request a fresh link or sign in.'}><Link className="primary-button auth-submit auth-link-button" to="/login">Back to log in <ArrowRight size={16} /></Link></AuthFrame>
-  return <AuthLoading message="Completing secure sign-in…" />
+  if (processing || status === 'loading') return <AuthLoading message="Completing secure sign-in…" />
+
+  const displayError = callbackError ?? authError ?? 'The authentication link could not be completed. Request a fresh link or sign in.'
+
+  return <AuthFrame eyebrow="SECURE SIGN-IN" title="Link expired or invalid" subtitle={displayError}>
+    <Link className="primary-button auth-submit auth-link-button" to="/login">Back to log in <ArrowRight size={16} /></Link>
+  </AuthFrame>
 }
 
 export function AuthBootstrapError() {
@@ -235,7 +408,26 @@ export function AuthLoading({ message }: { message: string }) {
 }
 
 function AuthFrame({ eyebrow, title, subtitle, children }: { eyebrow: string; title: string; subtitle: string; children: ReactNode }) {
-  return <main className="auth-page auth-form-page"><Link className="auth-back-link" to="/"><ArrowLeft size={15} /> DropZone home</Link><section className="auth-card"><DropZoneBrand /><div className="auth-card-heading"><span className="auth-eyebrow">{eyebrow}</span><h1>{title}</h1><p>{subtitle}</p></div>{children}<div className="auth-card-security"><LockKeyhole size={14} /> Authentication is handled by Supabase Auth.</div></section></main>
+  return <main className="auth-page auth-form-page">
+    <Link className="auth-back-link" to="/"><ArrowLeft size={15} /> DropZone home</Link>
+    <div className="auth-split-layout">
+      <aside className="auth-side-panel" aria-label="About DropZone">
+        <DropZoneBrand />
+        <span className="auth-eyebrow"><span /> Private event communities</span>
+        <h2>Built for calmer coordination.</h2>
+        <p>Give every attendee the right context, a clear path to help, and a secure place to stay connected.</p>
+        <div className="auth-side-list">
+          <div><strong>Verified access</strong><span>Only active event members can enter private spaces.</span></div>
+          <div><strong>Clear updates</strong><span>Announcements, reminders, and pending tasks stay easy to scan.</span></div>
+          <div><strong>Shared visibility</strong><span>Staff, participants, and moderators all work from the same event context.</span></div>
+        </div>
+      </aside>
+      <section className="auth-card">
+        <DropZoneBrand />
+        <div className="auth-card-heading"><span className="auth-eyebrow">{eyebrow}</span><h1>{title}</h1><p>{subtitle}</p></div>{children}<div className="auth-card-security"><LockKeyhole size={14} /> Authentication is handled by Supabase Auth.</div>
+      </section>
+    </div>
+  </main>
 }
 
 function DropZoneBrand() {

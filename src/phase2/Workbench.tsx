@@ -28,6 +28,24 @@ const Conversations = lazy(() =>
 const Notifications = lazy(() =>
   import("./Messaging").then((m) => ({ default: m.Notifications })),
 );
+import { createPortal } from "react-dom";
+import {
+  Users,
+  PlusSquare,
+  MapPin,
+  Users2,
+  Activity,
+  Shield,
+  FileText,
+  MessageSquare,
+  Radio,
+  Bell,
+  Settings,
+  Upload,
+  BarChart3,
+  CheckSquare,
+  History,
+} from "lucide-react";
 import { Safety } from "./Safety";
 import "./phase2.css";
 export function Workbench({
@@ -41,17 +59,33 @@ export function Workbench({
     { command } = useApi(e),
     [params, setParams] = useSearchParams(),
     [revision, setRevision] = useState<Post>();
+  const [sidebarSlot, setSidebarSlot] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const updateSlot = () => {
+      const desktop = window.innerWidth >= 1024;
+      if (desktop) {
+        setSidebarSlot(document.getElementById("stitch-sidebar-nav-root"));
+      } else {
+        setSidebarSlot(null);
+      }
+    };
+    updateSlot();
+    window.addEventListener("resize", updateSlot);
+    return () => window.removeEventListener("resize", updateSlot);
+  }, []);
+
   const page =
-      params.get("page") ??
-      (membership.role === "moderator"
-        ? permissions.includes("review_reports")
-          ? "reports"
-          : permissions.includes("review_custom_posts")
-            ? "review"
-            : permissions.includes("view_audit_log")
-              ? "audit"
-              : "feed"
-        : "feed"),
+    params.get("page") ??
+    (membership.role === "moderator"
+      ? permissions.includes("review_reports")
+        ? "reports"
+        : permissions.includes("review_custom_posts")
+          ? "review"
+          : permissions.includes("view_audit_log")
+            ? "audit"
+            : "feed"
+      : "feed"),
     id = params.get("id") ?? "";
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
@@ -65,47 +99,114 @@ export function Workbench({
   const valid =
     q.data && Array.isArray(q.data.zones) && Array.isArray(q.data.memberships);
   const o = valid ? q.data : null;
-  const pages = [
-    ["feed", "Community"],
-    ["create", "Create a post"],
-    ["activity", "My activity"],
-    ["zones", "Zones & map"],
-    ["conversations", "Talk to organizers"],
-    ["communications", "Communications"],
-    ["notifications", `Notifications${o ? " · " + o.unread : ""}`],
-    ["teams", "Teams"],
-    ["privacy", "Privacy & preferences"],
-    ["safety", "My reports & decisions"],
-    ...(permissions.includes("manage_event")
-      ? [["settings", "Event settings"]]
-      : []),
-    ...(permissions.includes("manage_members")
-      ? [["roster", "Roster import"]]
-      : []),
-    ...(permissions.includes("review_reports") ? [["reports", "Reports"]] : []),
-    ...(permissions.includes("review_custom_posts")
-      ? [["review", "Post review"]]
-      : []),
-    ...(permissions.includes("view_audit_log") ? [["audit", "Audit log"]] : []),
-  ];
+
+  const workflowGroups = [
+    {
+      title: "Community",
+      roleGated: false,
+      items: [
+        { key: "feed", label: "Community", icon: Users },
+        { key: "create", label: "Create a post", icon: PlusSquare },
+        { key: "zones", label: "Zones & map", icon: MapPin },
+        { key: "teams", label: "Teams", icon: Users2 },
+      ],
+    },
+    {
+      title: "My Activity",
+      roleGated: false,
+      items: [
+        { key: "activity", label: "My activity", icon: Activity },
+        { key: "privacy", label: "Privacy & preferences", icon: Shield },
+        { key: "safety", label: "My reports & decisions", icon: FileText },
+      ],
+    },
+    {
+      title: "Communication",
+      roleGated: false,
+      items: [
+        { key: "conversations", label: "Talk to organizers", icon: MessageSquare },
+        { key: "communications", label: "Communications", icon: Radio },
+        { key: "notifications", label: `Notifications${o ? " · " + o.unread : ""}`, icon: Bell },
+      ],
+    },
+    {
+      title: "Organizer Console",
+      roleGated: true,
+      items: [
+        ...(permissions.includes("manage_event")
+          ? [{ key: "settings", label: "Event settings", icon: Settings }]
+          : []),
+        ...(permissions.includes("manage_members")
+          ? [{ key: "roster", label: "Roster import", icon: Upload }]
+          : []),
+        ...(permissions.includes("review_reports")
+          ? [{ key: "reports", label: "Reports", icon: BarChart3 }]
+          : []),
+        ...(permissions.includes("review_custom_posts")
+          ? [{ key: "review", label: "Post review", icon: CheckSquare }]
+          : []),
+        ...(permissions.includes("view_audit_log")
+          ? [{ key: "audit", label: "Audit log", icon: History }]
+          : []),
+      ],
+    },
+  ].filter((group) => group.items.length > 0);
+
+  const pages = workflowGroups.flatMap((group) =>
+    group.items.map((item) => [item.key, item.label] as [string, string]),
+  );
+
+  const sidebarNavContent = (
+    <nav className="dz-navigation stitch-sidebar-nav" aria-label="Event workflows">
+      {workflowGroups.map((group) => (
+        <div key={group.title} className="stitch-nav-group">
+          <div className="stitch-nav-header">
+            <span>{group.title}</span>
+            {group.roleGated && (
+              <span className="stitch-role-gated-tag">Role Gated</span>
+            )}
+          </div>
+          <div className="stitch-nav-items">
+            {group.items.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                aria-current={page === item.key ? "page" : undefined}
+                className={`stitch-nav-btn ${page === item.key ? "active" : ""}`}
+                onClick={() => navigate(item.key)}
+              >
+                <item.icon size={16} aria-hidden="true" />
+                <span className="stitch-nav-label">{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </nav>
+  );
+
+  const fallbackNav = (
+    <nav className="dz-navigation" aria-label="Event workflows">
+      {pages.map(([key, label]) => (
+        <button
+          aria-current={page === key ? "page" : undefined}
+          className={page === key ? "active" : ""}
+          key={key}
+          onClick={() => navigate(key)}
+        >
+          {label}
+        </button>
+      ))}
+    </nav>
+  );
+
   return (
     <Suspense fallback={<p role="status">Loading workspace tools…</p>}>
       <div className="dz-workbench">
         <h2 ref={heading} tabIndex={-1} className="sr-only">
           {pages.find(([key]) => key === page)?.[1] ?? "Post details"}
         </h2>
-        <nav className="dz-navigation" aria-label="Event workflows">
-          {pages.map(([key, label]) => (
-            <button
-              aria-current={page === key ? "page" : undefined}
-              className={page === key ? "active" : ""}
-              key={key}
-              onClick={() => navigate(key)}
-            >
-              {label}
-            </button>
-          ))}
-        </nav>
+        {sidebarSlot ? createPortal(sidebarNavContent, sidebarSlot) : fallbackNav}
         <QueryState {...q} retry={q.refresh} />
         {!q.loading && !q.error && !valid && (
           <p role="alert">
@@ -131,6 +232,7 @@ export function Workbench({
                 mode={page as "feed" | "activity" | "review"}
                 zones={o.zones}
                 open={(id) => navigate("post", id)}
+                onOpenMap={() => navigate("zones")}
               />
             )}
             {page === "create" && (

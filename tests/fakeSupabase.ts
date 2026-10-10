@@ -51,6 +51,7 @@ export function createFakeSupabase(options: {
   signUpError?: Error | null
   signUpSession?: boolean
   signOutError?: Error | null
+  exchangeCodeError?: Error | null
 } = {}) {
   let currentSession = options.initialSession ?? null
   const pendingGetSessionReads: Array<() => void> = []
@@ -92,6 +93,12 @@ export function createFakeSupabase(options: {
         if (nextSession) emit('SIGNED_IN', nextSession)
         return { data: { user: nextSession?.user ?? makeSession().user, session: nextSession }, error: null }
       }),
+      exchangeCodeForSession: vi.fn(async (code: string) => {
+        if (options.exchangeCodeError) return { data: { user: null, session: null }, error: options.exchangeCodeError }
+        const nextSession = makeSession()
+        emit('SIGNED_IN', nextSession)
+        return { data: { user: nextSession.user, session: nextSession }, error: null }
+      }),
       resetPasswordForEmail: vi.fn(async () => ({ data: {}, error: null })),
       updateUser: vi.fn(async () => {
         if (!currentSession) return { data: { user: null }, error: new Error('Recovery session is missing') }
@@ -111,6 +118,29 @@ export function createFakeSupabase(options: {
         return { data: { event_id: TEST_EVENT_ID, event_name: 'Test Event', event_slug: 'test-event' }, error: null }
       }
       if (name === 'create_event_invitation') return { data: [{ invitation_id: 'invite-test', expires_at: new Date().toISOString() }], error: null }
+      if (name === 'dz_command') {
+        if (args?.p_action === 'event.create') {
+          const payload = args.p_data as Record<string, unknown>
+          const eventId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc'
+          const nextMembership = {
+            event_id: eventId,
+            event_name: String(payload.name ?? 'New Event'),
+            event_slug: String(payload.slug ?? 'new-event'),
+            role: 'organizer' as const,
+            permissions: ['manage_event'],
+            status: 'active' as const,
+          }
+          access = {
+            user_id: TEST_USER_ID,
+            display_name: 'Test Member',
+            memberships: [nextMembership, ...((access?.memberships ?? []) as TrustedAccess['memberships'])],
+          }
+          return { data: { id: eventId }, error: null }
+        }
+        if (args?.p_action === 'event.update' || args?.p_action === 'zone.save') {
+          return { data: { success: true }, error: null }
+        }
+      }
       return { data: null, error: new Error(`Unknown RPC ${name}`) }
     }),
   }

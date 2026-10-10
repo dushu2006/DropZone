@@ -4,7 +4,7 @@ The application intentionally has no seeded event, demo account, or public event
 
 **Acceptance prerequisite (2026-10-10):** apply the complete migration chain through `20261010030000_samartha_acceptance_security.sql` from [the deployment runbook](../docs/DEPLOYMENT.md) on an explicitly authorized target. Verify the linked project and back up existing data. This SQL is an operator procedure, not a command executed by this audit. Use a real consenting confirmed identity; never manufacture an Auth user or import a fabricated roster to satisfy acceptance. Revoked membership must be explicitly restored by appropriately authorized staff; invitation redemption intentionally cannot restore it.
 
-1. Create the real user's account through the public registration flow and complete email confirmation.
+1. Create the real user's account through the public registration flow (or complete email confirmation if enabled in your environment).
 2. In **Authentication → Users**, copy that account's UUID.
 3. Open the Supabase SQL Editor as a trusted project administrator. Replace the event name/slug and the account UUID below. The UUID setting is an identity, not a password or secret.
 4. Run the transaction once. It creates one real event and assigns the organizer's initial explicit permissions. Do not expose a service-role key in the browser.

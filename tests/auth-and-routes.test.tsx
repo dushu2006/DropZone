@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it } from 'vitest'
 import { AppRoutes } from '../src/App'
 import { AuthProvider, useAuth } from '../src/auth/AuthProvider'
-import { createFakeSupabase, makeAccess, makeSession, TEST_EVENT_ID } from './fakeSupabase'
+import { createFakeSupabase, makeAccess, makeSession, TEST_EVENT_ID, TEST_USER_ID } from './fakeSupabase'
 
 function renderRoutes(path: string, fake = createFakeSupabase()) {
   render(<MemoryRouter initialEntries={[path]}><AppRoutes client={fake.client} /></MemoryRouter>)
@@ -50,6 +50,34 @@ describe('Supabase authentication lifecycle', () => {
     expect(fake.rpc).not.toHaveBeenCalled()
   })
 
+  it('registers through Supabase Auth with email confirmation disabled and immediately enters the application', async () => {
+    const user = userEvent.setup()
+    const fake = createFakeSupabase({ signUpSession: true })
+    renderRoutes('/register', fake)
+    await user.type(await screen.findByLabelText('Name'), 'Immediate Member')
+    await user.type(screen.getByLabelText('Email'), 'immediate@example.test')
+    await user.type(screen.getByLabelText(/password/i), 'correct horse battery staple')
+    await user.click(screen.getByRole('button', { name: /create account/i }))
+    expect(await screen.findByRole('heading', { name: 'Welcome to DropZone' })).toBeTruthy()
+    expect(screen.queryByText(/check your email for a confirmation link/i)).toBeNull()
+    expect(fake.auth.signUp).toHaveBeenCalledWith(expect.objectContaining({
+      email: 'immediate@example.test',
+      password: 'correct horse battery staple',
+    }))
+  })
+
+  it('reports a registration error honestly without entering a private route', async () => {
+    const user = userEvent.setup()
+    const fake = createFakeSupabase({ signUpError: new Error('User already registered') })
+    renderRoutes('/register', fake)
+    await user.type(await screen.findByLabelText('Name'), 'Duplicate Member')
+    await user.type(screen.getByLabelText('Email'), 'duplicate@example.test')
+    await user.type(screen.getByLabelText(/password/i), 'correct horse battery staple')
+    await user.click(screen.getByRole('button', { name: /create account/i }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('User already registered')
+    expect(screen.queryByRole('heading', { name: 'Join an event' })).toBeNull()
+  })
+
   it('logs in through Supabase Auth and restores private routing from the returned session', async () => {
     const user = userEvent.setup()
     const fake = createFakeSupabase({ access: { user_id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', display_name: 'Member', memberships: [] } })
@@ -57,7 +85,7 @@ describe('Supabase authentication lifecycle', () => {
     await user.type(await screen.findByLabelText('Email'), 'member@example.test')
     await user.type(screen.getByLabelText('Password'), 'correct horse battery staple')
     await user.click(screen.getByRole('button', { name: /^log in/i }))
-    expect(await screen.findByRole('heading', { name: 'Join an event' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Welcome to DropZone' })).toBeTruthy()
     expect(fake.auth.signInWithPassword).toHaveBeenCalledOnce()
     expect(fake.rpc).toHaveBeenCalledWith('get_my_access')
   })
@@ -158,6 +186,38 @@ describe('Supabase authentication lifecycle', () => {
     expect(await screen.findByText(/could not reach supabase to restore your session/i)).toBeTruthy()
     expect(screen.getByRole('button', { name: /retry session check/i })).toBeTruthy()
   })
+
+  it('restores an authenticated route session on browser refresh without redirecting to login', async () => {
+    const session = makeSession()
+    const fake = createFakeSupabase({ initialSession: session, access: { user_id: session.user.id, display_name: 'Member', memberships: [] } })
+    renderRoutes('/app', fake)
+    expect(await screen.findByRole('heading', { name: 'Welcome to DropZone' })).toBeTruthy()
+    expect(screen.queryByRole('heading', { name: /log in to dropzone/i })).toBeNull()
+  })
+
+  it('exchanges a valid callback code once and enters the application', async () => {
+    const fake = createFakeSupabase()
+    renderRoutes('/auth/callback?code=valid-pkce-code', fake)
+    expect(await screen.findByRole('heading', { name: 'Welcome to DropZone' })).toBeTruthy()
+    expect(fake.auth.exchangeCodeForSession).toHaveBeenCalledWith('valid-pkce-code')
+  })
+
+  it('handles expired or invalid callback errors and displays a clear message without looping', async () => {
+    const fake = createFakeSupabase()
+    renderRoutes('/auth/callback?error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired', fake)
+    expect(await screen.findByRole('heading', { name: 'Link expired or invalid' })).toBeTruthy()
+    expect(screen.getByText(/email link is invalid or has expired/i)).toBeTruthy()
+    expect(screen.getByRole('link', { name: /back to log in/i })).toBeTruthy()
+  })
+
+  it('subscribes to onAuthStateChange once and cleans up on unmount', () => {
+    const fake = createFakeSupabase()
+    const { unmount } = render(<AuthProvider client={fake.client}><AuthStatusProbe /></AuthProvider>)
+    expect(fake.auth.onAuthStateChange).toHaveBeenCalledOnce()
+    const unsubscribe = (fake.auth.onAuthStateChange.mock.results[0].value as { data: { subscription: { unsubscribe: () => void } } }).data.subscription.unsubscribe
+    unmount()
+    expect(unsubscribe).toHaveBeenCalledOnce()
+  })
 })
 
 describe('protected routes and trusted role resolution', () => {
@@ -204,6 +264,38 @@ describe('protected routes and trusted role resolution', () => {
     await user.click(screen.getByRole('button', { name: /create 7-day participant code/i }))
     await waitFor(() => expect(fake.rpc).toHaveBeenCalledWith('create_event_invitation', expect.objectContaining({ p_event_id: TEST_EVENT_ID, p_token: expect.any(String) })))
     expect(await screen.findByLabelText(/one-time invitation code/i)).toBeTruthy()
+  })
+
+  it('does not auto-open a single membership when the user is signed in and should choose their event explicitly', async () => {
+    const fake = createFakeSupabase({ initialSession: makeSession(), access: makeAccess('organizer', ['manage_event']) })
+    renderRoutes('/app', fake)
+    expect(await screen.findByRole('heading', { name: 'Welcome to DropZone' })).toBeTruthy()
+    expect(screen.getByRole('link', { name: /join an event/i })).toBeTruthy()
+    expect(screen.getByRole('button', { name: /organize an event/i })).toBeTruthy()
+    expect(screen.queryByText(/organizer membership verified for this event/i)).toBeNull()
+  })
+
+  it('offers a create-event form when a trusted organizer has permission to start a new event', async () => {
+    const user = userEvent.setup()
+    const access = {
+      user_id: TEST_USER_ID,
+      display_name: 'Test Member',
+      memberships: [
+        { event_id: TEST_EVENT_ID, event_name: 'Current Event', event_slug: 'current-event', role: 'organizer', permissions: ['manage_event'], status: 'active' },
+        { event_id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', event_name: 'Second Event', event_slug: 'second-event', role: 'participant', permissions: [], status: 'active' },
+      ],
+    }
+    const fake = createFakeSupabase({ initialSession: makeSession(), access })
+    renderRoutes('/app', fake)
+    expect(await screen.findByRole('heading', { name: 'Welcome to DropZone' })).toBeTruthy()
+    await user.type(await screen.findByLabelText('Event name'), 'Launch Weekend')
+    await user.type(screen.getByLabelText('Unique event slug'), 'launch-weekend')
+    await user.click(screen.getByRole('button', { name: /^create event$/i }))
+    await waitFor(() => expect(fake.rpc).toHaveBeenCalledWith('dz_command', expect.objectContaining({
+      p_event: TEST_EVENT_ID,
+      p_action: 'event.create',
+      p_data: expect.objectContaining({ name: 'Launch Weekend', slug: 'launch-weekend' }),
+    })))
   })
 
   it('shows only assigned moderator permissions and does not infer organizer rights', async () => {

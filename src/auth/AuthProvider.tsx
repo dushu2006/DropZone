@@ -59,10 +59,16 @@ export function AuthProvider({ client, children }: { client: SupabaseClient<Data
       if (!mounted) return
       if (event === 'INITIAL_SESSION') {
         if (authEventVersion.current !== startingAuthEventVersion) return
-      } else {
-        authEventVersion.current += 1
-        sessionReadVersion.current += 1
+        if (nextSession) {
+          setSession(nextSession)
+          setStatus('authenticated')
+          setError(null)
+        }
+        return
       }
+
+      authEventVersion.current += 1
+      sessionReadVersion.current += 1
       setSession(nextSession)
       setStatus(nextSession ? 'authenticated' : 'anonymous')
       setError(null)

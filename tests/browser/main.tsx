@@ -6,6 +6,7 @@ import { AppRoutes } from "../../src/App";
 import "@fontsource/dm-sans/latin-400.css";
 import "@fontsource/manrope/latin-700.css";
 import "../../src/styles.css";
+import "../../src/stitch.css";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../../src/lib/database.types";
 const params = new URLSearchParams(location.search),

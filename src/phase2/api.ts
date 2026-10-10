@@ -60,28 +60,38 @@ export function useQuery<T>(eventId: string, kind: string, filter: Data = {}) {
     [error, setError] = useState("");
   const [version, setVersion] = useState(0);
   const key = JSON.stringify(filter);
-  const identity = JSON.stringify([session?.user.id, eventId, kind, key]);
-  const [loadedIdentity, setLoadedIdentity] = useState("");
+  const identity = JSON.stringify([
+    session?.user.id ?? "",
+    eventId,
+    kind,
+    key,
+  ]);
   const generation = useRef(0);
   useEffect(() => {
     const current = ++generation.current;
+    let active = true;
+
     setLoading(true);
     setError("");
     setData(null);
+
     read<T>(kind, JSON.parse(key))
       .then((value) => {
-        if (current === generation.current) {
-          setData(value);
-          setLoadedIdentity(identity);
-        }
+        if (!active || current !== generation.current) return;
+        setData(value);
       })
       .catch((e) => {
-        if (current === generation.current) setError(errorText(e));
+        if (!active || current !== generation.current) return;
+        setData(null);
+        setError(errorText(e));
       })
       .finally(() => {
-        if (current === generation.current) setLoading(false);
+        if (!active || current !== generation.current) return;
+        setLoading(false);
       });
+
     return () => {
+      active = false;
       generation.current++;
     };
   }, [read, kind, key, version, identity]);
@@ -93,7 +103,7 @@ export function useQuery<T>(eventId: string, kind: string, filter: Data = {}) {
     return () => window.removeEventListener("focus", refresh);
   }, []);
   return {
-    data: loadedIdentity === identity ? data : null,
+    data,
     loading,
     error,
     refresh: () => setVersion((v) => v + 1),

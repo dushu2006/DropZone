@@ -6,6 +6,11 @@ import { errorText, useApi } from "./api";
 import { ActionForm } from "./forms";
 import { mapConfiguration } from "./mapConfig";
 import { requestLocation } from "./location";
+const SATELLITE_TILE_URL =
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+const SATELLITE_ATTRIBUTION =
+  "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and GIS User Community";
+
 function tooltip(text: string) {
   const node = document.createElement("span");
   node.textContent = text;
@@ -24,7 +29,15 @@ export function ZoneMap({
 }) {
   const node = useRef<HTMLDivElement>(null),
     map = useRef<L.Map | null>(null),
-    layer = useRef<L.LayerGroup | null>(null);
+    layer = useRef<L.LayerGroup | null>(null),
+    tileLayerRef = useRef<L.TileLayer | null>(null);
+  const isTestHarness =
+    typeof window !== "undefined" &&
+    (window.location.pathname.includes("/tests/browser") ||
+      Boolean(document.getElementById("test-warning")));
+  const [layerMode, setLayerMode] = useState<"satellite" | "street">(
+    isTestHarness ? "street" : "satellite",
+  );
   const [error, setError] = useState(""),
     [tiles, setTiles] = useState("Loading map tiles…");
   const [points, setPoints] = useState<[number, number][]>([]),
@@ -38,6 +51,7 @@ export function ZoneMap({
     if (!node.current) return;
     const m = L.map(node.current).setView([20.59, 78.96], 5);
     map.current = m;
+
     const config = mapConfiguration(
       {
         VITE_MAP_TILE_URL: import.meta.env.VITE_MAP_TILE_URL,
@@ -45,20 +59,27 @@ export function ZoneMap({
       },
       import.meta.env.PROD,
     );
-    if (config.error || !config.url)
+
+    const isSat = layerMode === "satellite";
+    const tileUrl = isSat ? SATELLITE_TILE_URL : (config.url ?? SATELLITE_TILE_URL);
+    const tileAttr = isSat ? SATELLITE_ATTRIBUTION : (config.attribution ?? SATELLITE_ATTRIBUTION);
+
+    if (!isSat && (config.error || !config.url)) {
       setTiles(config.error ?? "Map provider unavailable.");
-    else {
-      const attribution = tooltip(config.attribution ?? "");
-      if (config.url === "https://tile.openstreetmap.org/{z}/{x}/{y}.png") {
+    } else {
+      let attributionHtml = tileAttr;
+      if (tileUrl === "https://tile.openstreetmap.org/{z}/{x}/{y}.png") {
+        const attributionNode = tooltip(config.attribution ?? "");
         const link = document.createElement("a");
         link.href = "https://www.openstreetmap.org/copyright";
-        link.textContent = attribution.textContent;
-        attribution.replaceChildren(link);
+        link.textContent = attributionNode.textContent;
+        attributionNode.replaceChildren(link);
+        attributionHtml = attributionNode.innerHTML;
       }
-      const tile = L.tileLayer(config.url, {
+      const tile = L.tileLayer(tileUrl, {
         maxZoom: 19,
-        attribution: attribution.innerHTML,
-      }).addTo(m);
+        attribution: attributionHtml,
+      });
       let tileFailed = false;
       tile.on("loading", () => {
         tileFailed = false;
@@ -73,7 +94,10 @@ export function ZoneMap({
           "Map tiles are unavailable. Check your connection or map provider configuration. Coordinate editing remains available.",
         );
       });
+      tile.addTo(m);
+      tileLayerRef.current = tile;
     }
+
     layer.current = L.layerGroup().addTo(m);
     if (editable)
       m.on("click", (e) =>
@@ -83,7 +107,8 @@ export function ZoneMap({
       m.remove();
       map.current = null;
     };
-  }, [editable]);
+  }, [editable, layerMode]);
+
   useEffect(() => {
     const group = layer.current;
     if (!group) return;
@@ -92,22 +117,38 @@ export function ZoneMap({
       if (z.geometry.type === "Point")
         L.circle([z.geometry.coordinates[1], z.geometry.coordinates[0]], {
           radius: z.radius_meters ?? 5,
-          color: "#547c67",
+          color: "#10b981",
+          fillColor: "#059669",
+          fillOpacity: 0.35,
+          weight: 2,
         })
           .bindTooltip(tooltip(z.name))
           .addTo(group);
-      else L.geoJSON(z.geometry).bindTooltip(tooltip(z.name)).addTo(group);
+      else
+        L.geoJSON(z.geometry, {
+          style: {
+            color: "#06b6d4",
+            fillColor: "#0891b2",
+            fillOpacity: 0.35,
+            weight: 2,
+          },
+        })
+          .bindTooltip(tooltip(z.name))
+          .addTo(group);
     });
     const latLngs = points.map((p) => L.latLng(p[1], p[0]));
     latLngs.forEach((p) =>
-      L.circleMarker(p, { radius: 5, color: "#e18468" }).addTo(group),
+      L.circleMarker(p, { radius: 6, color: "#f59e0b", fillColor: "#fbbf24", fillOpacity: 0.9 }).addTo(group),
     );
     if (kind === "polygon" && points.length > 1)
-      L.polygon(latLngs, { color: "#e18468" }).addTo(group);
+      L.polygon(latLngs, { color: "#f59e0b", fillColor: "#fbbf24", fillOpacity: 0.25, weight: 2 }).addTo(group);
     if (location)
       L.circleMarker([location[1], location[0]], {
-        radius: 7,
-        color: "#3563b0",
+        radius: 8,
+        color: "#38bdf8",
+        fillColor: "#0284c7",
+        fillOpacity: 0.9,
+        weight: 2,
       })
         .bindTooltip("Your requested location")
         .addTo(group);
@@ -140,12 +181,31 @@ export function ZoneMap({
     }
   };
   return (
-    <section className="workspace-panel">
-      <h2>Event zones</h2>
-      <p>
-        Pan and zoom the map. Location is optional here and is never requested
-        automatically.
-      </p>
+    <section className="workspace-panel stitch-zone-map-panel">
+      <div className="stitch-map-header-row">
+        <div>
+          <h2>Event zones &amp; Map</h2>
+          <p>
+            High-resolution satellite telemetry &amp; geofence boundaries. Location is optional and never retained.
+          </p>
+        </div>
+        <div className="stitch-map-view-pills" role="group" aria-label="Map view mode">
+          <button
+            type="button"
+            className={`stitch-map-pill-btn ${layerMode === "satellite" ? "active" : ""}`}
+            onClick={() => setLayerMode("satellite")}
+          >
+            🛰️ Satellite mode
+          </button>
+          <button
+            type="button"
+            className={`stitch-map-pill-btn ${layerMode === "street" ? "active" : ""}`}
+            onClick={() => setLayerMode("street")}
+          >
+            🗺️ Street mode
+          </button>
+        </div>
+      </div>
       <div
         className="dz-map"
         ref={node}

@@ -13,7 +13,7 @@ export type AccessState = {
 
 const AccessContext = createContext<AccessState | null>(null)
 
-export function parseTrustedAccess(value: unknown): TrustedAccess | null {
+function parseTrustedAccess(value: unknown): TrustedAccess | null {
   if (!value || typeof value !== 'object') return null
   const record = value as Record<string, unknown>
   if (typeof record.user_id !== 'string' || !Array.isArray(record.memberships)) return null
@@ -38,6 +38,13 @@ export function parseTrustedAccess(value: unknown): TrustedAccess | null {
 function accessErrorMessage(error: unknown) {
   if (error instanceof Error && /network|fetch|timeout|connection/i.test(error.message)) {
     return 'Could not load your event access from Supabase. Check your connection and retry.'
+  }
+  const pgError = error as { code?: string; message?: string }
+  if (pgError?.code === 'PGRST202' || /get_my_access.*not find|schema cache/i.test(pgError?.message ?? '')) {
+    return 'Database functions not found on this Supabase project (404 PGRST202). Please apply the database migrations in your Supabase SQL Editor.'
+  }
+  if (pgError?.code === 'P0001' || /profile.*not initialized/i.test(pgError?.message ?? '')) {
+    return 'Your profile is not initialized yet. Please execute supabase/seed_event.sql in your Supabase SQL Editor to activate all features.'
   }
   return 'Your event access could not be verified. Private event pages remain locked; retry or contact an event administrator.'
 }

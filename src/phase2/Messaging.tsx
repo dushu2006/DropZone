@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useApi, useQuery, timestamp } from "./api";
+import { useCallback, useEffect, useState } from "react";
+import { errorText, useApi, useQuery, timestamp } from "./api";
 import type { Data, Overview } from "./api";
 import { ActionForm, PageButtons, QueryState } from "./forms";
 export function Conversations({
@@ -277,15 +277,33 @@ export function Notifications({
   navigate: (page: string, id?: string) => void;
   refresh: () => void;
 }) {
-  const { command } = useApi(eventId),
-    [offset, setOffset] = useState(0),
-    q = useQuery<Data[]>(eventId, "notifications", { offset });
+  const { command, read } = useApi(eventId);
+  const [offset, setOffset] = useState(0);
+  const [data, setData] = useState<Data[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const refreshNotifications = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const next = await read<Data[]>("notifications", { offset });
+      setData(Array.isArray(next) ? next : []);
+    } catch (caught) {
+      setData([]);
+      setError(errorText(caught));
+    } finally {
+      setLoading(false);
+    }
+  }, [offset, read]);
+  useEffect(() => {
+    void refreshNotifications();
+  }, [refreshNotifications]);
   return (
     <section className="workspace-panel">
       <h2>In-app notifications</h2>
       <p>Opening this page does not mark anything read.</p>
-      <QueryState {...q} retry={q.refresh} />
-      {q.data?.map((n) => (
+      <QueryState loading={loading} error={error} retry={refreshNotifications} />
+      {data?.map((n) => (
         <article className="dz-post" key={String(n.id)}>
           <span className="dz-badge">{n.read_at ? "Read" : "Unread"}</span>
           <h3>{String(n.title)}</h3>
@@ -316,7 +334,7 @@ export function Notifications({
                 label="Mark read"
                 submit={async (_, key) => {
                   await command("notification.read", { id: n.id }, key);
-                  q.refresh();
+                  await refreshNotifications();
                   refresh();
                 }}
               />
@@ -324,7 +342,7 @@ export function Notifications({
           </div>
         </article>
       ))}
-      {q.data?.length === 0 && (
+      {data?.length === 0 && !loading && !error && (
         <p>
           No notifications yet. Notifications appear only after real activity.
         </p>
@@ -332,7 +350,7 @@ export function Notifications({
       <PageButtons
         offset={offset}
         setOffset={setOffset}
-        count={q.data?.length ?? 0}
+        count={data?.length ?? 0}
       />
     </section>
   );
