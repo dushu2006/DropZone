@@ -218,3 +218,17 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# DropZone web application
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+supabase/.temp/
+
+# Application source is not a Python packaging output.
+!src/lib/
+!src/lib/**
